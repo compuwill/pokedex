@@ -577,24 +577,25 @@ body {
     width: 100%;
     margin-bottom: -15%;
     margin-top: -10%;
+    transition: width 0.3s ease, transform 0.3s ease, filter 0.3s ease;
+}
+
+.shrink {    
+    transform: scale(0);
 }
 
 .black-filter {
     filter: brightness(0);
 }
 
-/* animate from black-filter*/
-.reveal-sprite {
-    animation: reveal-sprite 0.25s forwards;
+.pokedex-text {
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
-@keyframes reveal-sprite {
-    from {
-        filter: brightness(0);
-    }
-    to {
-        filter: brightness(1);
-    }
+.pokedex-text.hidden {
+    opacity: 0;
 }
+
 
 #pokemon-num-type {
     display: flex;

@@ -37,211 +37,233 @@ function getPokemonNumberFromUrl() {
     return number ? parseInt(number, 10) : null;
 }
 
-const pokemonNumber = getPokemonNumberFromUrl();
+let pokemonNumber = getPokemonNumberFromUrl();
 console.log('Pokedex Entry from URL:', pokemonNumber);
 
+let pokemonDataLoaded = false;
+let totalPokemon = 1010; // as of current PokeAPI data
+
+// declare audio variables
+let cryUrl = '';
+window.currentCryAudio = null;
+window.currentVoiceAudio = null;
+
 // Fetch Pokémon data from PokeAPI
-if (pokemonNumber) {
-    fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Fetched Pokémon Data:', data);
+function fetchPokemonData(pokemonNumber) {
+    if (pokemonNumber) {
+        fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched Pokémon Data:', data);
 
-            const spriteUrl = data.sprites.front_default;
-            const spriteImg = document.getElementById('pokemon-sprite');
-            if (spriteImg && spriteUrl) {
-                spriteImg.src = spriteUrl;
-            }
-            const nameElem = document.getElementById('pokemon-name');
-            if (nameElem) {
-                // get the species name and capitalize first letter
-                const speciesName = data.species.name;
-                nameElem.textContent = speciesName.charAt(0).toUpperCase() + speciesName.slice(1);
-            }
-            // display pokemon number and type(s)
-            const numElem = document.getElementById('pokemon-number');
-            if (numElem) {
-                numElem.textContent = `#${String(data.id).padStart(3, '0')}`;
-            }
-            const typeElem = document.getElementById('pokemon-type');
-            if (typeElem) {
-                //for each type, create a bulma rounded tag element
-                typeElem.innerHTML = data.types.map(t => {
-                    const typeColors = {
-                        normal: "#A8A77A",
-                        fire: "#EE8130",
-                        water: "#6390F0",
-                        electric: "#F7D02C",
-                        grass: "#7AC74C",
-                        ice: "#96D9D6",
-                        fighting: "#C22E28",
-                        poison: "#A33EA1",
-                        ground: "#E2BF65",
-                        flying: "#A98FF3",
-                        psychic: "#F95587",
-                        bug: "#A6B91A",
-                        rock: "#B6A136",
-                        ghost: "#735797",
-                        dragon: "#6F35FC",
-                        dark: "#705746",
-                        steel: "#B7B7CE",
-                        fairy: "#D685AD"
-                    };
-                    const color = typeColors[t.type.name] || "#888";
-                    return `<span class="tag is-rounded py-0" style="background-color: ${color}; color: white;">${t.type.name.toUpperCase()}</span>`;
-
-                }).join('');
-            }
-            const descriptionElem = document.getElementById('pokemon-description');
-            if (descriptionElem) {
-
-                //if the number is contained in pokemonDescriptions, use that description instead
-                if (pokemonDescriptions[data.id]) {
-                    descriptionElem.innerHTML = `<ul>${pokemonDescriptions[data.id]}</ul>`;
-                } else {
-
-                    // Fetch species data for description
-                    fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`)
-                        .then(response => response.json())
-                        .then(speciesData => {
-                            console.log('Species Data:', speciesData);
-                            descriptionElem.textContent = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en').flavor_text;
-                            // Display the first four English flavor text entries as list items
-                            const flavorTexts = speciesData.flavor_text_entries
-                                .filter(entry => entry.language.name === 'en')
-                                .map(entry => entry.flavor_text.replace(/\f/g, ' '))
-                                .slice(0, 10); // get first 10 entries
-
-                            //iterate through and see if there are any that use 50% or more of the same words, if so, remove them
-                            const uniqueFlavorTexts = [];
-                            flavorTexts.forEach(text => {
-                                const isDuplicate = uniqueFlavorTexts.some(uniqueText => {
-                                    const uniqueWords = uniqueText.split(' ');
-                                    const totalWords = text.split(' ').length;
-                                    const matchingWords = uniqueWords.filter(word => text.includes(word)).length;
-                                    return (matchingWords / totalWords) >= 0.5;
-                                });
-                                if (!isDuplicate) {
-                                    uniqueFlavorTexts.push(text.replace(/\n/g, ' '));
-                                }
-                            });
-
-                            //use only 3 unique flavor texts
-                            const finalFlavorTexts = uniqueFlavorTexts.slice(0, 3);
-                            let verbiage = `${nameElem.textContent}, `;
-                            // add the first type to verbiage
-                            if (data.types.length > 0) {
-                                verbiage += `a ${data.types[0].type.name} Pokémon. \n\n`;
-                            }
-                            verbiage += finalFlavorTexts.join('\n');
-                            //store the verbiage in a data attribute for later use
-                            document.getElementById('btn-description').dataset.verbiage = verbiage;
-
-                            descriptionElem.innerHTML = `<ul>${finalFlavorTexts.map(text => `<li>${text}</li>`).join('')}</ul>`;
-
-                        })
-                        .catch(error => {
-                            console.error('Error fetching Pokémon species data:', error);
-                        });
+                const spriteUrl = data.sprites.front_default;
+                const spriteImg = document.getElementById('pokemon-sprite');
+                if (spriteImg && spriteUrl) {
+                    spriteImg.src = spriteUrl;
                 }
 
-                // assign the button to play cry sound again or tapping the sprite
-                const cryButton = document.getElementById('btn-battlecry');
-                const descriptionButton = document.getElementById('btn-description');
+                //get cry url from data
+                cryUrl = data.cries?.latest || data.cries?.legacy;
 
-                const playCry = () => {
-                    console.log('Playing cry for', data.name);
+                const nameElem = document.getElementById('pokemon-name');
+                if (nameElem) {
+                    // get the species name and capitalize first letter
+                    const speciesName = data.species.name;
+                    nameElem.textContent = speciesName.charAt(0).toUpperCase() + speciesName.slice(1);
+                }
+                // display pokemon number and type(s)
+                const numElem = document.getElementById('pokemon-number');
+                if (numElem) {
+                    numElem.textContent = `#${String(data.id).padStart(3, '0')}`;
+                }
+                const typeElem = document.getElementById('pokemon-type');
+                if (typeElem) {
+                    //for each type, create a bulma rounded tag element
+                    typeElem.innerHTML = data.types.map(t => {
+                        const typeColors = {
+                            normal: "#A8A77A",
+                            fire: "#EE8130",
+                            water: "#6390F0",
+                            electric: "#F7D02C",
+                            grass: "#7AC74C",
+                            ice: "#96D9D6",
+                            fighting: "#C22E28",
+                            poison: "#A33EA1",
+                            ground: "#E2BF65",
+                            flying: "#A98FF3",
+                            psychic: "#F95587",
+                            bug: "#A6B91A",
+                            rock: "#B6A136",
+                            ghost: "#735797",
+                            dragon: "#6F35FC",
+                            dark: "#705746",
+                            steel: "#B7B7CE",
+                            fairy: "#D685AD"
+                        };
+                        const color = typeColors[t.type.name] || "#888";
+                        return `<span class="tag is-rounded py-0" style="background-color: ${color}; color: white;">${t.type.name.toUpperCase()}</span>`;
 
-                    //stop if a description is being spoken
-                    speechSynthesis.cancel();
+                    }).join('');
+                }
+                const descriptionElem = document.getElementById('pokemon-description');
+                if (descriptionElem) {
 
-                    if (window.currentCryAudio && !window.currentCryAudio.paused) {
-                        window.currentCryAudio.currentTime = 0;
-                        window.currentCryAudio.pause();
-                        return;
-                    }
-
-                    if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
-                        window.currentVoiceAudio.currentTime = 0;
-                        window.currentVoiceAudio.pause();
-                    }
-
-                    if (window.currentCryAudio && !window.currentCryAudio.paused) {
-                        window.currentCryAudio.currentTime = 0;
+                    //if the number is contained in pokemonDescriptions, use that description instead
+                    if (pokemonDescriptions[data.id]) {
+                        descriptionElem.innerHTML = `<ul>${pokemonDescriptions[data.id]}</ul>`;
+                        pokemonDataLoaded = true;
+                        showPokedexData();
                     } else {
-                        //get cry url from data
-                        const cryUrl = data.cries?.latest || data.cries?.legacy;
-                        window.currentCryAudio = new Audio(cryUrl);
-                        window.currentCryAudio.play();
+
+                        // Fetch species data for description
+                        fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`)
+                            .then(response => response.json())
+                            .then(speciesData => {
+                                console.log('Species Data:', speciesData);
+                                descriptionElem.textContent = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en').flavor_text;
+                                // Display the first four English flavor text entries as list items
+                                const flavorTexts = speciesData.flavor_text_entries
+                                    .filter(entry => entry.language.name === 'en')
+                                    .map(entry => entry.flavor_text.replace(/\f/g, ' '))
+                                    .slice(0, 10); // get first 10 entries
+
+                                //iterate through and see if there are any that use 50% or more of the same words, if so, remove them
+                                const uniqueFlavorTexts = [];
+                                flavorTexts.forEach(text => {
+                                    const isDuplicate = uniqueFlavorTexts.some(uniqueText => {
+                                        const uniqueWords = uniqueText.split(' ');
+                                        const totalWords = text.split(' ').length;
+                                        const matchingWords = uniqueWords.filter(word => text.includes(word)).length;
+                                        return (matchingWords / totalWords) >= 0.5;
+                                    });
+                                    if (!isDuplicate) {
+                                        uniqueFlavorTexts.push(text.replace(/\n/g, ' '));
+                                    }
+                                });
+
+                                //use only 3 unique flavor texts
+                                const finalFlavorTexts = uniqueFlavorTexts.slice(0, 3);
+                                let verbiage = `${nameElem.textContent}, `;
+                                // add the types to verbiage
+                                if (data.types.length > 0) {
+                                    verbiage += `a ${data.types.map(type => type.type.name).join(' ')} Pokémon. \n\n`;
+                                }
+                                verbiage += finalFlavorTexts.join('\n');
+                                //store the verbiage in a data attribute for later use
+                                document.getElementById('btn-description').dataset.verbiage = verbiage;
+
+                                descriptionElem.innerHTML = `<ul>${finalFlavorTexts.map(text => `<li>${text}</li>`).join('')}</ul>`;
+
+                                pokemonDataLoaded = true;
+                                showPokedexData();
+                            })
+                            .catch(error => {
+                                console.error('Error fetching Pokémon species data:', error);
+                                document.getElementById('tap-to-scan').textContent = 'Scan Failed. Please try again.';
+                            });
                     }
-                    // make the pokemon sprite shake
-                    if (spriteImg) {
-                        spriteImg.classList.add('shake');
-                        setTimeout(() => {
-                            spriteImg.classList.remove('shake');
-                        }, 500);
-                    }
-                    speechSynthesis.cancel();
-                };
-
-                const playDescription = () => {
-                    console.log('Playing description for', data.name);
-                    if (pokemonVoiceDescriptions.includes(data.id)) {
-                        //if currentVoiceAudio is playing, stop it
-                        if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
-                            window.currentVoiceAudio.currentTime = 0;
-                            window.currentVoiceAudio.pause();
-                            return
-                        }
-
-                        if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
-                            window.currentVoiceAudio.pause();
-                            window.currentVoiceAudio.currentTime = 0;
-                        }
-                        window.currentVoiceAudio = new Audio(`assets/voice/${String(data.id).padStart(3, '0')}.wav`);
-                        window.currentVoiceAudio.play();
-                    }
-                    else {
-                        const utterance = new SpeechSynthesisUtterance(document.getElementById('btn-description').dataset.verbiage);
-
-                        if (navigator.userAgent.includes('Windows')) {
-                            utterance.rate = 2;
-                            utterance.pitch = 1.3;
-                        }
-                        else if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent) && !window.MSStream) {
-                            utterance.rate = 1;
-                            utterance.pitch = 1;
-                        }
-                        else {
-                            utterance.rate = 1.25;
-                            utterance.pitch = 1;
-                        }
 
 
-                        speechSynthesis.speak(utterance);
-                    }
-                };
-
-                if (descriptionButton) {
-                    descriptionButton.addEventListener('click', playDescription);
                 }
-                if (cryButton) {
-                    cryButton.addEventListener('click', playCry);
-                }
-                if (spriteImg) {
-                    spriteImg.addEventListener('click', playCry);
-                }
+            })
+            .catch(error => {
+                console.error('Error fetching Pokémon data:', error);
+            });
+    }
+}
 
-                //attempt to auto play the description after loading
-                // setTimeout(() => {
-                //     playDescription();
-                // }, 1000);
+//run fetch on page load
+fetchPokemonData(pokemonNumber);
 
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching Pokémon data:', error);
-        });
+
+// assign the button to play cry sound again or tapping the sprite
+const cryButton = document.getElementById('btn-battlecry');
+const descriptionButton = document.getElementById('btn-description');
+
+const playCry = () => {
+    let spriteImg = document.getElementById('pokemon-sprite');
+    //stop if a description is being spoken
+    speechSynthesis.cancel();
+
+    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+        window.currentCryAudio.currentTime = 0;
+        window.currentCryAudio.pause();
+        return;
+    }
+
+    if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+        window.currentVoiceAudio.currentTime = 0;
+        window.currentVoiceAudio.pause();
+    }
+
+    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+        window.currentCryAudio.currentTime = 0;
+    } else {
+        window.currentCryAudio = new Audio(cryUrl);
+        window.currentCryAudio.play();
+    }
+    // make the pokemon sprite shake
+    if (spriteImg) {
+        spriteImg.classList.add('shake');
+        setTimeout(() => {
+            spriteImg.classList.remove('shake');
+        }, 500);
+    }
+    speechSynthesis.cancel();
+};
+
+const playDescription = () => {
+
+    if (pokemonVoiceDescriptions.includes(pokemonNumber)) {
+        //if currentVoiceAudio is playing, stop it
+        if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+            window.currentVoiceAudio.currentTime = 0;
+            window.currentVoiceAudio.pause();
+            return
+        }
+
+        if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+            window.currentVoiceAudio.pause();
+            window.currentVoiceAudio.currentTime = 0;
+        }
+        window.currentVoiceAudio = new Audio(`assets/voice/${String(data.id).padStart(3, '0')}.wav`);
+        window.currentVoiceAudio.play();
+    }
+    else {
+        const utterance = new SpeechSynthesisUtterance(document.getElementById('btn-description').dataset.verbiage);
+
+        if (navigator.userAgent.includes('Windows')) {
+            utterance.rate = 2;
+            utterance.pitch = 1.3;
+        }
+        else if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent) && !window.MSStream) {
+            utterance.rate = 1;
+            utterance.pitch = 1;
+        }
+        else {
+            utterance.rate = 1.25;
+            utterance.pitch = 1;
+        }
+
+
+        speechSynthesis.speak(utterance);
+    }
+};
+
+if (descriptionButton) {
+    //remove previous event listeners
+    descriptionButton.removeEventListener('click', playDescription);
+    descriptionButton.addEventListener('click', playDescription);
+}
+if (cryButton) {
+    //remove previous event listeners
+    cryButton.removeEventListener('click', playCry);
+    cryButton.addEventListener('click', playCry);
+}
+if (document.getElementById('pokemon-sprite')) {
+    //remove previous event listeners
+    document.getElementById('pokemon-sprite').removeEventListener('click', playCry);
+    document.getElementById('pokemon-sprite').addEventListener('click', playCry);
 }
 
 
@@ -256,27 +278,31 @@ window.addEventListener('blur', () => {
 
 // if tap-to-scan is clicked, reveal pokemon info
 document.getElementById('tap-to-scan').addEventListener('click', () => {
+    if (!pokemonDataLoaded) {
+        return;
+    }
+
     document.getElementById('tap-to-scan').style.display = 'none';
-    document.getElementById('pokemon-sprite').classList.add('reveal-sprite');
-    //remove black-filter from pokemon-sprite after 0.25 seconds
-    setTimeout(() => {
-        document.getElementById('pokemon-sprite').classList.remove('black-filter');
-        document.getElementById('pokemon-sprite').classList.remove('reveal-sprite');
-    }, 250);
+    document.getElementById('pokemon-sprite').classList.remove('black-filter');
 
     setTimeout(() => {
         //perform click on btn-battlecry
         document.getElementById('btn-battlecry').click();
     }, 500);
 
+    // ensure after the timeout, the current pokemon number is still the same
+    let currentPokemonNumber = pokemonNumber;
+
     setTimeout(() => {
         //if the battlecry audio is still playing, wait until it's done
         const checkAndPlayDescription = () => {
             if (window.currentCryAudio && !window.currentCryAudio.paused) {
                 window.currentCryAudio.onended = () => {
+                    if (currentPokemonNumber !== pokemonNumber) { return; }
                     document.getElementById('btn-description').click();
                 };
             } else {
+                if (currentPokemonNumber !== pokemonNumber) { return; }
                 document.getElementById('btn-description').click();
             }
         };
@@ -285,4 +311,136 @@ document.getElementById('tap-to-scan').addEventListener('click', () => {
         checkAndPlayDescription();
     }, 1500);
 
+});
+
+
+// if dpad buttons are clicked, play sound effect
+document.querySelectorAll('.dpad .up, .dpad .down, .dpad .left, .dpad .right').forEach(button => {
+    button.addEventListener('click', () => {
+        const direction = button.classList[1]; // get the direction (up, down, left, right)
+        playBeep()
+    });
+});
+
+// play dpad click sound effect
+function playBeep() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "square";
+    osc.frequency.setValueAtTime(220, ctx.currentTime); // base click tone
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+}
+
+//if dpad left is pressed, go to previous pokemon entry
+document.querySelector('.dpad .left').addEventListener('click', () => {
+    //stop any current audio or speech
+    speechSynthesis.cancel();
+    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+        window.currentCryAudio.pause();
+    }
+    if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+        window.currentVoiceAudio.pause();
+    }
+
+
+    if (pokemonNumber && pokemonNumber > 1) {
+        hidePokedexData();
+        //decrement pokemon number
+        pokemonNumber -= 1;
+        //fetch previous pokemon data
+        fetchPokemonData(pokemonNumber);
+        //update URL without reloading page
+        window.history.pushState({}, '', `?entry=${pokemonNumber}`);
+
+
+    }
+});
+
+//if dpad right is pressed, go to next pokemon entry
+document.querySelector('.dpad .right').addEventListener('click', () => {
+    //stop any current audio or speech
+    speechSynthesis.cancel();
+    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+        window.currentCryAudio.pause();
+    }
+    if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+        window.currentVoiceAudio.pause();
+    }
+
+    if (pokemonNumber && pokemonNumber < totalPokemon) {
+        hidePokedexData();
+        //increment pokemon number
+        pokemonNumber += 1;
+        //fetch next pokemon data
+        fetchPokemonData(pokemonNumber);
+        //update URL without reloading page
+        window.history.pushState({}, '', `?entry=${pokemonNumber}`);
+
+
+    }
+});
+
+//if dpad up is pressed, scroll up screen-content
+document.querySelector('.dpad .up').addEventListener('click', () => {
+    const content = document.querySelector('.screen-content');
+    content.scrollBy({
+        top: -100,
+        behavior: 'smooth'
+    });
+});
+
+//if dpad down is pressed, scroll down screen-content
+document.querySelector('.dpad .down').addEventListener('click', () => {
+    const content = document.querySelector('.screen-content');
+    content.scrollBy({
+        top: 100,
+        behavior: 'smooth'
+    });
+});
+
+function hidePokedexData() {
+    //black out current sprite
+    const spriteImg = document.getElementById('pokemon-sprite');
+    // spriteImg.classList.add('black-filter');
+    //for each pokedex text element, add hidden class
+    document.querySelectorAll('.pokedex-text').forEach(elem => {
+        elem.classList.add('hidden');
+    });
+    //shrink sprite
+    spriteImg.classList.add('shrink');
+}
+
+function showPokedexData() {
+    const spriteImg = document.getElementById('pokemon-sprite');
+    // spriteImg.classList.remove('black-filter');
+    //for each pokedex text element, remove hidden class
+    document.querySelectorAll('.pokedex-text').forEach(elem => {
+        elem.classList.remove('hidden');
+    });
+    //remove shrink class if present
+    if (spriteImg) { spriteImg.classList.remove('shrink'); }
+}
+
+
+//if btn-gray is pressed, play beep sound
+document.getElementById('btn-gray').addEventListener('click', () => {
+    playBeep();
+});
+
+// if btn-red is pressed, play beep sound
+document.getElementById('btn-red').addEventListener('click', () => {
+    playBeep();
+});
+
+// if btn-blue is pressed, play beep sound
+document.getElementById('btn-blue').addEventListener('click', () => {
+    playBeep();
 });

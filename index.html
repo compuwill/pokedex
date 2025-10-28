@@ -59,13 +59,13 @@
                             <h1 class="title has-text-centered overlap" id="tap-to-scan">Tap To Scan</h1>
 
                             <img id="pokemon-sprite" class="black-filter" src="" alt="">
-                            <h2 id="pokemon-name" class="title has-text-centered mb-0">Loading...</h2>
+                            <h2 id="pokemon-name" class="title pokedex-text has-text-centered mb-0">Loading...</h2>
                             <h3 id="pokemon-num-type"
-                                class="has-text-centered is-size-5 is-flex is-align-items-center is-justify-content-center mb-2">
+                                class="pokedex-text has-text-centered is-size-5 is-flex is-align-items-center is-justify-content-center mb-2">
                                 <p id="pokemon-number">#---</p>
                                 <p id="pokemon-type">Loading...</p>
                             </h3>
-                            <ul id="pokemon-description" class="is-size-5">
+                            <ul id="pokemon-description" class="pokedex-text is-size-5">
                                 <li>Loading...</li>
                             </ul>
                             <div class="screen-scanlines"></div>
@@ -98,9 +98,9 @@
         <div class="controls pb-6">
             <div class="buttons-left">
                 <div class="h-stack-buttons">
-                    <div class="circle-btn gray"></div>
-                    <div class="rect-btn red"></div>
-                    <div class="rect-btn blue"></div>
+                    <div id="btn-gray" class="circle-btn gray is-unselectable"></div>
+                    <div id="btn-red" class="rect-btn red"></div>
+                    <div id="btn-blue" class="rect-btn blue"></div>
                 </div>
                 <div class="h-stack-buttons mt-2">
                     <div class="bar-btn"></div>
@@ -110,7 +110,7 @@
 
             <div class="buttons-right">
 
-                <div class="dpad">
+                <div id="dpad" class="dpad">
                     <div class="up"></div>
                     <div class="right"></div>
                     <div class="down"></div>
