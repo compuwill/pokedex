@@ -5,6 +5,22 @@
  */
 
 
+
+
+// manual descriptions for certain pokemon for an escape room project
+const pokemonDescriptions = {
+    425: `<li>These Pokémon are called the "Signpost for Wandering Spirits."</li>
+          <li>Children holding them sometimes vanish.</li>
+          <li>Stories go that it grabs the hands of small children and drags them away to the afterlife.</li>`,
+    777: `<li>A large, dragon-like Pokémon with powerful wings.</li>
+          <li>It is known for its fierce temper and territorial behavior.</li>
+          <li>Legends say it can create storms by flapping its wings.</li>`,
+    // Add more descriptions as needed
+};
+
+// pokedex entries with voice descriptions
+const pokemonVoiceDescriptions = [425, 777];
+
 function getPokemonNumberFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const number = params.get('entry');
@@ -12067,66 +12083,108 @@ if (pokemonNumber) {
                         fairy: "#D685AD"
                     };
                     const color = typeColors[t.type.name] || "#888";
-                    return `<span class="tag is-rounded" style="background-color: ${color}; color: white;">${t.type.name.toUpperCase()}</span>`;
+                    return `<span class="tag is-rounded py-0" style="background-color: ${color}; color: white;">${t.type.name.toUpperCase()}</span>`;
 
                 }).join('');
             }
             const descriptionElem = document.getElementById('pokemon-description');
             if (descriptionElem) {
-                // Fetch species data for description
-                fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`)
-                    .then(response => response.json())
-                    .then(speciesData => {
-                        console.log('Species Data:', speciesData);
-                        descriptionElem.textContent = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en').flavor_text;
-                        // Display the first four English flavor text entries as list items
-                        const flavorTexts = speciesData.flavor_text_entries
-                            .filter(entry => entry.language.name === 'en')
-                            .map(entry => entry.flavor_text.replace(/\f/g, ' '))
-                            .slice(0, 4);
 
-                        descriptionElem.innerHTML = `<ul>${flavorTexts.map(text => `<li>${text}</li>`).join('')}`;
-
-                    })
-                    .catch(error => {
-                        console.error('Error fetching Pokémon species data:', error);
-                    });
-            }
-
-            const cryUrl = data.cries?.latest || data.cries?.legacy;
-            if (cryUrl) {
-                const audio = new Audio(cryUrl);
-                audio.play();
-            }
-
-            // assign the button to play cry sound again or tapping the sprite
-            const cryButton = document.getElementById('btn-battlecry');
-            const playCry = () => {
-                if (window.currentCryAudio && !window.currentCryAudio.paused) {
-                    window.currentCryAudio.currentTime = 0;
+                //if the number is contained in pokemonDescriptions, use that description instead
+                if (pokemonDescriptions[data.id]) {
+                    descriptionElem.innerHTML = `<ul>${pokemonDescriptions[data.id]}</ul>`;
                 } else {
-                    window.currentCryAudio = new Audio(cryUrl);
-                    window.currentCryAudio.play();
+
+                    // Fetch species data for description
+                    fetch(`https://pokeapi.co/api/v2/pokemon-species/${pokemonNumber}`)
+                        .then(response => response.json())
+                        .then(speciesData => {
+                            console.log('Species Data:', speciesData);
+                            descriptionElem.textContent = speciesData.flavor_text_entries.find(entry => entry.language.name === 'en').flavor_text;
+                            // Display the first four English flavor text entries as list items
+                            const flavorTexts = speciesData.flavor_text_entries
+                                .filter(entry => entry.language.name === 'en')
+                                .map(entry => entry.flavor_text.replace(/\f/g, ' '))
+                                .slice(0, 3);
+                                document.getElementById('pokemon-description').dataset.flavorTexts = flavorTexts.join(' ');
+
+                            descriptionElem.innerHTML = `<ul>${flavorTexts.map(text => `<li>${text}</li>`).join('')}</ul>`;
+
+                        })
+                        .catch(error => {
+                            console.error('Error fetching Pokémon species data:', error);
+                        });
                 }
-                // make the pokemon sprite shake
+
+                const cryUrl = data.cries?.latest || data.cries?.legacy;
+                if (cryUrl) {
+                    const audio = new Audio(cryUrl);
+                    audio.play();
+                }
+
+                // assign the button to play cry sound again or tapping the sprite
+                const cryButton = document.getElementById('btn-battlecry');
+                const descriptionButton = document.getElementById('btn-description');
+                const playCry = () => {
+                    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+                        window.currentCryAudio.currentTime = 0;
+                    } else {
+                        window.currentCryAudio = new Audio(cryUrl);
+                        window.currentCryAudio.play();
+                    }
+                    // make the pokemon sprite shake
+                    if (spriteImg) {
+                        spriteImg.classList.add('shake');
+                        setTimeout(() => {
+                            spriteImg.classList.remove('shake');
+                        }, 500);
+                    }
+                    speechSynthesis.cancel();
+                };
+
+                const playDescription = () => {
+                    if (pokemonVoiceDescriptions.includes(data.id)) {
+                        const audio = new Audio(`assets/voice/${String(data.id).padStart(3, '0')}.wav`);
+                        audio.play();
+                    }
+                    else
+                    {
+                        let verbiage = `${data.name}, `;
+                        // add the first type to verbiage
+                        if (data.types.length > 0) {
+                            verbiage += `a ${data.types[0].type.name} Pokémon. `;
+                        }
+
+                        const utterance = new SpeechSynthesisUtterance(verbiage + document.getElementById('pokemon-description').dataset.flavorTexts.replace(/\n/g, ' '));
+                        utterance.rate = 2;
+                        utterance.pitch = 1.3;
+                        
+                        speechSynthesis.speak(utterance);
+                    }
+                };
+
+                if (descriptionButton) {
+                    descriptionButton.addEventListener('click', playDescription);
+                }
+                if (cryButton) {
+                    cryButton.addEventListener('click', playCry);
+                }
                 if (spriteImg) {
-                    spriteImg.classList.add('shake');
-                    setTimeout(() => {
-                        spriteImg.classList.remove('shake');
-                    }, 500);
+                    spriteImg.addEventListener('click', playCry);
                 }
-            };
 
-            if (cryButton) {
-                cryButton.addEventListener('click', playCry);
             }
-            if (spriteImg) {
-                spriteImg.addEventListener('click', playCry);
-            }
-
-
         })
         .catch(error => {
             console.error('Error fetching Pokémon data:', error);
         });
 }
+
+
+// if page loses focus, stop speech synthesis and audio playback
+window.addEventListener('blur', () => {
+    speechSynthesis.cancel();
+    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+        window.currentCryAudio.pause();
+    }
+});

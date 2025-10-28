@@ -34,9 +34,11 @@ body {
     font-style: normal;
     font-weight: 500;
     color: #656565;
-    text-shadow:
-        0.1vh 0.1vh 0 #000,
-        -0.1vh -0.1vh 0 #fff;
+    text-shadow: 1px 1px 1px #ffffff, 0 1px 0 #fff4;
+}
+
+.tag {
+    height: unset!important;
 }
 
 /* Pokedex Container */
@@ -296,6 +298,20 @@ body {
     position: relative;
     overflow: hidden;
     overflow-y: auto;
+    opacity: 0;
+    animation-delay: 1s;
+    animation: screen-fade-in 0.7s ease forwards;
+}
+
+@keyframes screen-fade-in {
+    from {
+        opacity: 0;
+        background-color: #000;
+    }
+    to {
+        opacity: 1;
+        background-color: #f8f8f8;
+    }
 }
 
 .screen-scanlines {
@@ -541,7 +557,7 @@ body {
     /* object-fit: zoom; */
     width: 100%;
     margin-bottom: -15%;
-    margin-top: -20%;
+    margin-top: -10%;
 }
 
 #pokemon-num-type {
