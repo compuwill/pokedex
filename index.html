@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pokedex</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Micro+5&family=Orbitron:wght@400..900&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Icons -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+</head>
+
+<body>
+    <div class="pokedex is-flex is-flex-direction-column is-align-items-center">
+        <div class="top-section is-flex">
+            <div class="big-circle mr-3"></div>
+            <div class="small-lights">
+                <div class="light blinking-yellow"></div>
+                <div class="light blinking-red"></div>
+                <div class="light blinking-green"></div>
+            </div>
+        </div>
+
+        <div class="pokedex-header">
+            <svg viewBox="0 0 100 16" preserveAspectRatio="none" class="header-svg">
+                <path d="M0 10 H45 L55 3 H100" class="shader-line" />
+                <path d="M0 8 H45 L55 1 H100" class="header-line" />
+                <path d="M0 12 H45 L55 5 H100" class="header-line" />
+            </svg>
+        </div>
+
+        <div class="pokedex-screen-container">
+            <div class="pokedex-frame-wrapper">
+                <!-- SVG Frame -->
+                <svg viewBox="0 0 100 120" class="pokedex-frame-svg" preserveAspectRatio="none">
+                    <path d="M0,0 H100 V120 H15 L0,106 Z" class="frame-bg" />
+                </svg>
+
+                <!-- HTML Content Area (the gray display) -->
+                <div class="display-area">
+                    <div class="indicator-lights">
+                        <div class="light red"></div>
+                        <div class="light red"></div>
+                    </div>
+
+                    <div class="screen">
+                        <div class="screen-content p-3" id="screen-content">
+                            <!-- Dynamic content will be injected here -->
+                            <img id="pokemon-sprite" src="" alt="">
+                            <h2 id="pokemon-name" class="title has-text-centered mb-0">Loading...</h2>
+                            <h3 id="pokemon-num-type"
+                                class="has-text-centered is-size-5 is-flex is-align-items-center is-justify-content-center mb-2">
+                                <p id="pokemon-number">#---</p>
+                                <p id="pokemon-type">Loading...</p>
+                            </h3>
+                            <ul id="pokemon-description" class="is-size-5">
+                                <li>Loading...</li>
+                            </ul>
+                            <div class="screen-scanlines"></div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-elements">
+                        <div class="is-flex is-align-items-center">
+                            <div id="btn-battlecry" class="circle-btn ml-6"></div>
+                            <div class="ml-2 engraved-text is-size-6">
+                                <span class="material-symbols-outlined" style="vertical-align:middle;">ear_sound</span>
+                            </div>
+                        </div>
+
+                        <div class="speaker">
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                            <div class="bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="buttons-left">
+                <div class="h-stack-buttons">
+                    <div class="circle-btn gray"></div>
+                    <div class="rect-btn red"></div>
+                    <div class="rect-btn blue"></div>
+                </div>
+                <div class="h-stack-buttons mt-2">
+                    <div class="bar-btn"></div>
+                </div>
+
+            </div>
+
+            <div class="buttons-right">
+
+                <div class="dpad">
+                    <div class="up"></div>
+                    <div class="right"></div>
+                    <div class="down"></div>
+                    <div class="left"></div>
+                    <div class="center"></div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</body>
+<script defer src="assets/js/main.js"></script>
+
+</html>
