@@ -210,7 +210,7 @@ body {
 .pokedex-screen-container {
     width: 90vw;
     max-width: 500px;
-    aspect-ratio: 1 / 1.6;
+    aspect-ratio: 1 / 1.5;
     position: relative;
 }
 
@@ -277,7 +277,7 @@ body {
 /* Screen (gray area) */
 .screen {
     /* flex-grow: 1; */
-    height: 53vh;
+    height: 52vh;
     background-color: #4f4f4f;
     border-radius: 0.6vh;
     border: 0.6vh solid #afafaf;
