@@ -37,6 +37,11 @@ body {
     text-shadow: 1px 1px 1px #ffffff, 0 1px 0 #fff4;
 }
 
+.engraved-text.red {
+    color: #b71c1c;
+    text-shadow: 1px 1px 1px #ff8a80, 0 1px 0 #ff8a80;
+}
+
 .tag {
     height: unset!important;
 }

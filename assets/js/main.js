@@ -9,7 +9,7 @@
 
 // manual descriptions for certain pokemon for an escape room project
 const pokemonDescriptions = {
-    425: `<li>These Pokémon are called the "Signpost for Wandering Spirits."</li>
+    425: `<li>A Pokémon formed by the spirits of people and other Pokémon. It loves damp, humid places.</li>
           <li>Children holding them sometimes vanish.</li>
           <li>Stories go that it grabs the hands of small children and drags them away to the afterlife.</li>`,
 
@@ -53,6 +53,11 @@ if (!pokemonNumber) {
             });
     }
 }
+
+//if there is a hint parameter in the URL set the hint text
+const params = new URLSearchParams(window.location.search);
+const hint = params.get('hint');
+
 
 let pokemonDataLoaded = false;
 let totalPokemon = 1010; // as of current PokeAPI data
@@ -454,6 +459,11 @@ function showPokedexData() {
 //if btn-gray is pressed, play beep sound
 document.getElementById('btn-gray').addEventListener('click', () => {
     playBeep();
+
+    if (hint) {
+        alert(`Hint: ${hint}`);
+    }
+
 });
 
 // if btn-red is pressed, play beep sound
