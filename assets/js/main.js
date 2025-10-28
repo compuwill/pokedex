@@ -12,7 +12,7 @@ const pokemonDescriptions = {
     425: `<li>These Pokémon are called the "Signpost for Wandering Spirits."</li>
           <li>Children holding them sometimes vanish.</li>
           <li>Stories go that it grabs the hands of small children and drags them away to the afterlife.</li>`,
-    
+
 };
 
 
@@ -203,8 +203,16 @@ if (pokemonNumber) {
                     }
                     else {
                         const utterance = new SpeechSynthesisUtterance(document.getElementById('btn-description').dataset.verbiage);
-                        utterance.rate = 2;
-                        utterance.pitch = 1.3;
+
+                        if (navigator.userAgent.includes('Windows')) {
+                            utterance.rate = 2;
+                            utterance.pitch = 1.3;
+                        }
+                        else {
+                            utterance.rate = 1.25;
+                            utterance.pitch = 1;
+                        }
+
 
                         speechSynthesis.speak(utterance);
                     }
