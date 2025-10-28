@@ -163,6 +163,13 @@ function fetchPokemonData(pokemonNumber) {
                                     verbiage += `a ${data.types.map(type => type.type.name).join(' ')} Pokémon. \n\n`;
                                 }
                                 verbiage += finalFlavorTexts.join('\n');
+
+                                //replace any uppercase species names with the proper pronunciation
+                                const speciesName = data.species.name;
+                                const capitalizedSpeciesName = speciesName.charAt(0).toUpperCase() + speciesName.slice(1);
+                                const regex = new RegExp(`\\b${capitalizedSpeciesName.toUpperCase()}\\b`, 'g'); // word boundary to match whole words only
+                                verbiage = verbiage.replace(regex, capitalizedSpeciesName.split('-').join(' '));
+
                                 //store the verbiage in a data attribute for later use
                                 document.getElementById('btn-description').dataset.verbiage = verbiage;
 
