@@ -461,7 +461,7 @@ document.getElementById('btn-gray').addEventListener('click', () => {
     playBeep();
 
     if (hint) {
-        alert(`Hint: ${hint}`);
+        bulmaAlert('Hint', hint, 'is-danger');
     }
 
 });
