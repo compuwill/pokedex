@@ -36,9 +36,23 @@ function getPokemonNumberFromUrl() {
     const number = params.get('entry');
     return number ? parseInt(number, 10) : null;
 }
-
 let pokemonNumber = getPokemonNumberFromUrl();
 console.log('Pokedex Entry from URL:', pokemonNumber);
+
+//if no pokemon number in URL, and url has name parameter, try to fetch pokemon by name
+if (!pokemonNumber) {
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    if (name) {
+        fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
+            .then(response => response.json())
+            .then(data => {
+                pokemonNumber = data.id;
+                console.log('Pokedex Entry from Name:', pokemonNumber);
+                fetchPokemonData(pokemonNumber);
+            });
+    }
+}
 
 let pokemonDataLoaded = false;
 let totalPokemon = 1010; // as of current PokeAPI data
