@@ -30,7 +30,7 @@ function getPokemonNumberFromUrl() {
 const pokemonNumber = getPokemonNumberFromUrl();
 console.log('Pokedex Entry from URL:', pokemonNumber);
 
-
+// Fetch Pokémon data from PokeAPI
 if (pokemonNumber) {
     fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
         .then(response => response.json())
@@ -12116,19 +12116,32 @@ if (pokemonNumber) {
                         });
                 }
 
-                const cryUrl = data.cries?.latest || data.cries?.legacy;
-                if (cryUrl) {
-                    const audio = new Audio(cryUrl);
-                    audio.play();
-                }
-
                 // assign the button to play cry sound again or tapping the sprite
                 const cryButton = document.getElementById('btn-battlecry');
                 const descriptionButton = document.getElementById('btn-description');
+
                 const playCry = () => {
+                    console.log('Playing cry for', data.name);
+
+                    //stop if a description is being spoken
+                    speechSynthesis.cancel();
+
+                    if (window.currentCryAudio && !window.currentCryAudio.paused) {
+                        window.currentCryAudio.currentTime = 0;
+                        window.currentCryAudio.pause();
+                        return;
+                    }
+
+                    if(window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+                        window.currentVoiceAudio.currentTime = 0;
+                        window.currentVoiceAudio.pause();
+                    }
+
                     if (window.currentCryAudio && !window.currentCryAudio.paused) {
                         window.currentCryAudio.currentTime = 0;
                     } else {
+                        //get cry url from data
+                        const cryUrl = data.cries?.latest || data.cries?.legacy;
                         window.currentCryAudio = new Audio(cryUrl);
                         window.currentCryAudio.play();
                     }
@@ -12143,9 +12156,21 @@ if (pokemonNumber) {
                 };
 
                 const playDescription = () => {
+                    console.log('Playing description for', data.name);
                     if (pokemonVoiceDescriptions.includes(data.id)) {
-                        const audio = new Audio(`assets/voice/${String(data.id).padStart(3, '0')}.wav`);
-                        audio.play();
+                        //if currentVoiceAudio is playing, stop it
+                        if(window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+                            window.currentVoiceAudio.currentTime = 0;
+                            window.currentVoiceAudio.pause();
+                            return
+                        }
+
+                        if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+                            window.currentVoiceAudio.pause();
+                            window.currentVoiceAudio.currentTime = 0;
+                        }
+                        window.currentVoiceAudio = new Audio(`assets/voice/${String(data.id).padStart(3, '0')}.wav`);
+                        window.currentVoiceAudio.play();
                     }
                     else
                     {
@@ -12172,6 +12197,11 @@ if (pokemonNumber) {
                 if (spriteImg) {
                     spriteImg.addEventListener('click', playCry);
                 }
+
+                //attempt to auto play the description after loading
+                setTimeout(() => {
+                    playDescription();
+                }, 1000);
 
             }
         })
