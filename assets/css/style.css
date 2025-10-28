@@ -585,6 +585,21 @@ body {
     transition: width 0.3s ease, transform 0.3s ease, filter 0.3s ease;
 }
 
+.speaking {
+    animation: speaking-bounce 0.25s infinite alternate;
+}
+
+@keyframes speaking-bounce {
+    0% {
+        transform: translateY(0) scale(1);
+        filter: none;
+    }
+    100% {
+        transform: translateY(-8%) scale(1.04);
+        filter: drop-shadow(0 2px 4px #ffeb3b88);
+    }
+}
+
 .shrink {    
     transform: scale(0);
 }

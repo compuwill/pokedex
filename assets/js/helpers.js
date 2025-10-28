@@ -36,11 +36,11 @@ function bulmaAlert(title, message, colorClass = 'is-info', onClose) {
   modal.innerHTML = `
     <div class="modal-background"></div>
     <div class="modal-card" style="max-width: 400px;">
-      <header class="modal-card-head py-4 has-background-${colorClass.replace('is-', '')}">
-        <p class="modal-card-title is-size-6 ${titleClass}">${title}</p>
+      <header class="modal-card-head py-3 has-background-${colorClass.replace('is-', '')}">
+        <p class="modal-card-title is-size-4 ${titleClass}">${title}</p>
       </header>
       <section class="modal-card-body is-flex is-align-items-center">
-        <span class="material-symbols-outlined is-size-2 mr-4">${icon}</span><p>${message}</p>
+        <span class="material-symbols-outlined is-size-2 mr-4">${icon}</span><p class="is-size-5">${message}</p>
       </section>
       <footer class="modal-card-foot px-3 py-1" style="justify-content: flex-end;">
         <button class="button" id="bulma-alert-close">Close</button>
@@ -99,7 +99,7 @@ function bulmaConfirm(title, message, colorClass = 'is-info', onConfirm, onCance
     <div class="modal-background"></div>
     <div class="modal-card" style="width: 400px;">
       <header class="modal-card-head py-4 has-background-${colorClass.replace('is-', '')}">
-        <p class="modal-card-title is-size-6 ${titleClass}">${title}</p>
+        <p class="modal-card-title is-size-5 ${titleClass}">${title}</p>
       </header>
       <section class="modal-card-body is-flex is-align-items-center">
         <span class="material-symbols-outlined is-size-1 mr-4">${icon}</span><p>${message}</p>

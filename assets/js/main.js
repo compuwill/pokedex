@@ -58,6 +58,21 @@ if (!pokemonNumber) {
 const params = new URLSearchParams(window.location.search);
 const hint = params.get('hint');
 
+//if translate parameter is set
+const translate = params.get('translate');
+if (translate) {
+    //change tap-to-scan text to "Tap to Translate"
+    const tapToScan = document.getElementById('tap-to-scan');
+    if (tapToScan) {
+        tapToScan.textContent = 'Tap to Translate';
+    }
+}
+
+// map of transcripts of translate audio files for their audio codes
+const translateTranscripts = {
+    'hint-2': 'Heh heh, fooled you! Ditto saw... Drifloon float that way… toward something warm... and cozy. It looked like.. it was drawn.. by the flicker of... fire!'
+};
+
 
 let pokemonDataLoaded = false;
 let totalPokemon = 1010; // as of current PokeAPI data
@@ -319,26 +334,91 @@ document.getElementById('tap-to-scan').addEventListener('click', () => {
     // ensure after the timeout, the current pokemon number is still the same
     let currentPokemonNumber = pokemonNumber;
 
-    setTimeout(() => {
-        //if the battlecry audio is still playing, wait until it's done
-        const checkAndPlayDescription = () => {
-            if (window.currentCryAudio && !window.currentCryAudio.paused) {
-                window.currentCryAudio.onended = () => {
+    if (!translate) {
+        setTimeout(() => {
+            //if the battlecry audio is still playing, wait until it's done
+            const checkAndPlayDescription = () => {
+                if (window.currentCryAudio && !window.currentCryAudio.paused) {
+                    window.currentCryAudio.onended = () => {
+                        if (currentPokemonNumber !== pokemonNumber) { return; }
+                        document.getElementById('btn-description').click();
+                    };
+                } else {
                     if (currentPokemonNumber !== pokemonNumber) { return; }
                     document.getElementById('btn-description').click();
-                };
-            } else {
-                if (currentPokemonNumber !== pokemonNumber) { return; }
-                document.getElementById('btn-description').click();
-            }
-        };
+                }
+            };
 
-        //perform click on btn-description
-        checkAndPlayDescription();
-    }, 1500);
+            //perform click on btn-description
+            checkAndPlayDescription();
+        }, 1500);
+    }
+    else {
+        setTimeout(() => {
+            //if the battlecry audio is still playing, wait until it's done
+            const checkAndPlayTranslation = () => {
+                if (window.currentCryAudio && !window.currentCryAudio.paused) {
+                    window.currentCryAudio.onended = () => {
+                        if (currentPokemonNumber !== pokemonNumber) { return; }
+                        playTranslateAudio(translate);
+                    };
+                } else {
+                    if (currentPokemonNumber !== pokemonNumber) { return; }
+                    playTranslateAudio(translate);
+                }
+            };
+
+            //perform click on btn-description
+            checkAndPlayTranslation();
+        }, 1500);
+    }
 
 });
 
+// if translation text is clicked, play translate audio again
+document.getElementById('translation-text').addEventListener('click', () => {
+    playTranslateAudio(translate);
+});
+
+function playTranslateAudio(audioCode) {
+    // stop speech synthesis and any current audio
+    speechSynthesis.cancel();
+
+    if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+        window.currentVoiceAudio.currentTime = 0;
+        window.currentVoiceAudio.pause();
+        return;
+    }
+    window.currentVoiceAudio = new Audio(`assets/hint/${audioCode}.wav`);
+    window.currentVoiceAudio.play();
+
+    //show translation text if available
+    const translationTextElem = document.getElementById('translation-text');
+    if (translationTextElem && translateTranscripts[audioCode]) {
+        translationTextElem.textContent = `(${translateTranscripts[audioCode]})`;
+        translationTextElem.classList.remove('hidden');
+    }
+
+    //add a speaking animation to the pokemon sprite
+    const spriteImg = document.getElementById('pokemon-sprite');
+    if (spriteImg) {
+        spriteImg.classList.add('speaking');
+        const removeSpeakingClass = () => {
+            if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+                // Check again after 200ms
+                setTimeout(removeSpeakingClass, 200);
+            } else {
+                spriteImg.classList.remove('speaking');
+            }
+        };
+        setTimeout(removeSpeakingClass, 1000);
+    }
+
+    //disable the dpad buttons by adding the style pointer-events: none
+    document.querySelectorAll('.dpad .up, .dpad .down, .dpad .left, .dpad .right').forEach(button => {
+        button.style.pointerEvents = 'none';
+    });
+}
 
 // if dpad buttons are clicked, play sound effect
 document.querySelectorAll('.dpad .up, .dpad .down, .dpad .left, .dpad .right').forEach(button => {
@@ -475,3 +555,10 @@ document.getElementById('btn-red').addEventListener('click', () => {
 document.getElementById('btn-blue').addEventListener('click', () => {
     playBeep();
 });
+
+
+//if parameter hinton is set, show hint alert on page load
+let hinton = params.get('hinton');
+if (hinton == 'true' || hinton == '1') {
+    bulmaAlert('Hint', hint, 'is-danger');
+}
