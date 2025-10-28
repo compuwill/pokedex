@@ -208,6 +208,10 @@ if (pokemonNumber) {
                             utterance.rate = 2;
                             utterance.pitch = 1.3;
                         }
+                        else if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent) && !window.MSStream) {
+                            utterance.rate = 1;
+                            utterance.pitch = 1;
+                        }
                         else {
                             utterance.rate = 1.25;
                             utterance.pitch = 1;
