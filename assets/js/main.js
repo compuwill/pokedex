@@ -247,7 +247,7 @@ const playDescription = () => {
             window.currentVoiceAudio.pause();
             window.currentVoiceAudio.currentTime = 0;
         }
-        window.currentVoiceAudio = new Audio(`assets/voice/${String(data.id).padStart(3, '0')}.wav`);
+        window.currentVoiceAudio = new Audio(`assets/voice/${String(pokemonNumber).padStart(3, '0')}.wav`);
         window.currentVoiceAudio.play();
     }
     else {
