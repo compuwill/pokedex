@@ -56,23 +56,39 @@ if (!pokemonNumber) {
 
 //if there is a hint parameter in the URL set the hint text
 const params = new URLSearchParams(window.location.search);
-const hint = params.get('hint');
+const hintURL = params.get('hint');
 
-//if translate parameter is set
-const translate = params.get('translate');
-if (translate) {
-    //change tap-to-scan text to "Tap to Translate"
+
+// map of clue data audio files for their audio codes, and tap button text
+const clueData = {
+    'bathroom-ditto': {
+        audioCode: 'bathroom-ditto',
+        tapButtonText: 'Tap to Translate',
+        transcript: `Ah—! "What... am I doing here?" I—I was just… uhh… reshaping! Yeah! Just… reshaping!! Heh… heheh…
+
+Oh! Right! The—uh—floaty one! The balloon ghost thing?
+
+It—uh—drifted that way! Toward a flickering light! For, um… warmth? Yeah.
+
+And please forget you saw me here. Blorp…!`
+    }
+};
+
+//if clue parameter is set
+const clueURL = params.get('clue');
+if (clueURL) {
+    //load clue data
+    const clue = clueData[clueURL];
+
+    //change tap-to-scan text to clues tap text
     const tapToScan = document.getElementById('tap-to-scan');
     if (tapToScan) {
-        tapToScan.textContent = 'Tap to Translate';
+        tapToScan.textContent = clue.tapButtonText;
     }
 }
 
-// map of transcripts of translate audio files for their audio codes
-const translateTranscripts = {
-    'hint-2': 'Heh heh, fooled you! Ditto saw... Drifloon float that way… toward something warm... and cozy. It looked like.. it was drawn.. by the flicker of... fire!'
-};
-
+// load seenClues from localStorage
+let seenClues = JSON.parse(localStorage.getItem('seenClues')) || {};
 
 let pokemonDataLoaded = false;
 let totalPokemon = 1010; // as of current PokeAPI data
@@ -314,6 +330,9 @@ window.addEventListener('blur', () => {
     if (window.currentCryAudio && !window.currentCryAudio.paused) {
         window.currentCryAudio.pause();
     }
+    if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
+        window.currentVoiceAudio.pause();
+    }
 });
 
 
@@ -334,10 +353,10 @@ document.getElementById('tap-to-scan').addEventListener('click', () => {
     // ensure after the timeout, the current pokemon number is still the same
     let currentPokemonNumber = pokemonNumber;
 
-    if (!translate) {
+    if (!clueURL) {
         setTimeout(() => {
             //if the battlecry audio is still playing, wait until it's done
-            const checkAndPlayDescription = () => {
+            const waitUntilCryOver = () => {
                 if (window.currentCryAudio && !window.currentCryAudio.paused) {
                     window.currentCryAudio.onended = () => {
                         if (currentPokemonNumber !== pokemonNumber) { return; }
@@ -350,26 +369,34 @@ document.getElementById('tap-to-scan').addEventListener('click', () => {
             };
 
             //perform click on btn-description
-            checkAndPlayDescription();
+            waitUntilCryOver();
         }, 1500);
     }
     else {
+
+        //disable the btn-cry and btn-description buttons for 3 seconds
+        document.getElementById('btn-battlecry').style.pointerEvents = 'none';
+        document.getElementById('btn-description').style.pointerEvents = 'none';
+        setTimeout(() => {
+            document.getElementById('btn-battlecry').style.pointerEvents = 'auto';
+            document.getElementById('btn-description').style.pointerEvents = 'auto';
+        }, 3000);
+
         setTimeout(() => {
             //if the battlecry audio is still playing, wait until it's done
-            const checkAndPlayTranslation = () => {
+            const waitUntilCryOver = () => {
                 if (window.currentCryAudio && !window.currentCryAudio.paused) {
                     window.currentCryAudio.onended = () => {
                         if (currentPokemonNumber !== pokemonNumber) { return; }
-                        playTranslateAudio(translate);
+                        playClueAudio(clueURL);
                     };
                 } else {
                     if (currentPokemonNumber !== pokemonNumber) { return; }
-                    playTranslateAudio(translate);
+                    playClueAudio(clueURL);
                 }
             };
 
-            //perform click on btn-description
-            checkAndPlayTranslation();
+            waitUntilCryOver();
         }, 1500);
     }
 
@@ -377,10 +404,15 @@ document.getElementById('tap-to-scan').addEventListener('click', () => {
 
 // if translation text is clicked, play translate audio again
 document.getElementById('translation-text').addEventListener('click', () => {
-    playTranslateAudio(translate);
+    playClueAudio(clueURL);
 });
 
-function playTranslateAudio(audioCode) {
+function playClueAudio(clueCode) {
+    //get clue object from clueData
+    const clue = clueData[clueCode];
+
+    console.log('Playing clue audio for:', clue);
+
     // stop speech synthesis and any current audio
     speechSynthesis.cancel();
 
@@ -389,13 +421,13 @@ function playTranslateAudio(audioCode) {
         window.currentVoiceAudio.pause();
         return;
     }
-    window.currentVoiceAudio = new Audio(`assets/hint/${audioCode}.wav`);
+    window.currentVoiceAudio = new Audio(`assets/clue/${clue.audioCode}.wav`);
     window.currentVoiceAudio.play();
 
     //show translation text if available
     const translationTextElem = document.getElementById('translation-text');
-    if (translationTextElem && translateTranscripts[audioCode]) {
-        translationTextElem.textContent = `(${translateTranscripts[audioCode]})`;
+    if (translationTextElem && clue.transcript) {
+        translationTextElem.textContent = `(${clue.transcript})`;
         translationTextElem.classList.remove('hidden');
     }
 
@@ -403,6 +435,11 @@ function playTranslateAudio(audioCode) {
     const spriteImg = document.getElementById('pokemon-sprite');
     if (spriteImg) {
         spriteImg.classList.add('speaking');
+
+        //add clueCode to seenClues array if it doesn't exist and save to localStorage
+        seenClues[clueCode] = true;
+        localStorage.setItem('seenClues', JSON.stringify(seenClues));
+
         const removeSpeakingClass = () => {
             if (window.currentVoiceAudio && !window.currentVoiceAudio.paused) {
                 // Check again after 200ms
@@ -540,25 +577,58 @@ function showPokedexData() {
 document.getElementById('btn-gray').addEventListener('click', () => {
     playBeep();
 
-    if (hint) {
-        bulmaAlert('Hint', hint, 'is-danger');
+    if (hintURL) {
+        bulmaAlert('Hint', hintURL, 'is-danger');
     }
 
 });
 
+let redButtonPressCount = 0;
+
 // if btn-red is pressed, play beep sound
 document.getElementById('btn-red').addEventListener('click', () => {
     playBeep();
+
+    redButtonPressCount += 1;
+    setTimeout(() => {
+        redButtonPressCount = 0;
+    }, 2000);
+
+    //if button pressed 5 times quickly, ask to clear seen clues
+    if (redButtonPressCount >= 5) {
+        bulmaConfirm('Clear Seen Clues', 'Are you sure you want to clear all seen clues? This action cannot be undone.', 'is-warning', () => {
+            seenClues = {};
+            localStorage.setItem('seenClues', JSON.stringify(seenClues));
+        });
+    }
+
 });
+
+let blueButtonPressCount = 0;
 
 // if btn-blue is pressed, play beep sound
 document.getElementById('btn-blue').addEventListener('click', () => {
     playBeep();
+
+    blueButtonPressCount += 1;
+    setTimeout(() => {
+        blueButtonPressCount = 0;
+    }, 2000);
+
+    //if button pressed 5 times quickly, show seen clues
+    if (blueButtonPressCount >= 5) {
+        // show a bulma alert with all seen clues
+        let seenClueList = '';
+        for (const clueCode in seenClues) {
+            seenClueList += `<li>${clueCode}</li>`;
+        }
+        bulmaAlert('Seen Clues', `<ul>${seenClueList}</ul>`, 'is-info');
+    }
 });
 
 
 //if parameter hinton is set, show hint alert on page load
 let hinton = params.get('hinton');
 if (hinton == 'true' || hinton == '1') {
-    bulmaAlert('Hint', hint, 'is-danger');
+    bulmaAlert('Hint', hintURL, 'is-danger');
 }
