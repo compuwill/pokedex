@@ -801,3 +801,21 @@ let hinton = params.get('hinton');
 if (hinton == 'true' || hinton == '1') {
     bulmaAlert('Hint', hintURL, 'is-danger');
 }
+
+
+
+
+//compatibilty for smaller phones
+function adjustForSmallScreens() {
+    //check if the special buttons are offscreen below the viewport
+    const specialButtons = document.getElementById('special-buttons');
+    const rect = specialButtons.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight) {
+        //if offscreen, adjust position to top right of screen
+        specialButtons.style.position = 'absolute';
+        specialButtons.style.top = '10px';
+        specialButtons.style.right = '10px';
+        
+    }
+}
+adjustForSmallScreens();
