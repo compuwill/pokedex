@@ -4,8 +4,29 @@
  * This file serves as the entry point for the application, initializing core modules and orchestrating the main workflow.
  */
 
-
-
+//cache all audio files by creating Audio objects
+const audioUrls = [
+    'assets/clue/bathroom-ditto.wav',
+    'assets/clue/module-found.mp3',
+    'assets/voice/001.wav',
+    'assets/voice/004.wav',
+    'assets/voice/007.wav',
+    'assets/voice/039.wav',
+    'assets/voice/054.wav',
+    'assets/voice/083.wav',
+    'assets/voice/094.wav',
+    'assets/voice/113.wav',
+    'assets/voice/143.wav',
+    'assets/voice/355.wav',
+    'assets/voice/425.wav',
+    'assets/voice/778.wav'
+]
+function cacheAudioFiles(audioUrls) {
+    audioUrls.forEach(url => {
+        const audio = new Audio(url);
+    });
+}
+cacheAudioFiles(audioUrls);
 
 // manual descriptions for certain pokemon for an escape room project
 const pokemonDescriptions = {
@@ -15,6 +36,14 @@ const pokemonDescriptions = {
 
 };
 
+
+let pokemonDataLoaded = false;
+let totalPokemon = 1010; // as of current PokeAPI data
+
+// declare audio variables
+let cryUrl = '';
+window.currentCryAudio = null;
+window.currentVoiceAudio = null;
 
 // Pokedex entries (by National Dex number) that have custom voice descriptions:
 // 1    - Bulbasaur
@@ -56,13 +85,13 @@ if (!pokemonNumber) {
 
 //if there is a hint parameter in the URL set the hint text
 const params = new URLSearchParams(window.location.search);
-const hintURL = params.get('hint');
+var hintURL = params.get('hint');
 
 
 // map of clue data audio files for their audio codes, and tap button text
 const clueData = {
     'bathroom-ditto': {
-        audioCode: 'bathroom-ditto',
+        audioFile: 'bathroom-ditto.wav',
         tapButtonText: 'Tap to Translate',
         transcript: `Ah—! "What... am I doing here?" I—I was just… uhh… reshaping! Yeah! Just… reshaping!! Heh… heheh…
 
@@ -70,37 +99,113 @@ Oh! Right! The—uh—floaty one! The balloon ghost thing?
 
 It—uh—drifted that way! Toward a flickering light! For, um… warmth? Yeah.
 
-And please forget you saw me here. Blorp…!`
+And please forget you saw me here. Blorp…!`,
+        requiredClue: 'module-found',
+        failedHint: 'Woah! Ditto is trying to speak! I need a translation module to understand what this Ditto is saying.',
+        successHint: 'With the translation module installed, I can understand what Ditto is saying!',
+        successExtraHint: 'Ditto mentioned a flickering light. Maybe I should investigate that next. Could it be a Pokémon?',
+    },
+    'module-found': {
+        tapButtonText: 'Tap to Install',
+        transcript: `Oh! You found it! The missing module!`,
+        sprite: 'assets/images/pokedex-chip.png',
+        nameOverride: 'Translation Module',
+        descriptionOverride: `<ul><li>A special translation module for the Pokédex.</li>
+<li>Enables translation of Pokémon that want to communicate.</li></ul>`,
+        cryUrl: 'assets/clue/module-found.mp3'
     }
+
 };
 
 //if clue parameter is set
-const clueURL = params.get('clue');
-if (clueURL) {
-    //load clue data
-    const clue = clueData[clueURL];
-
-    //change tap-to-scan text to clues tap text
-    const tapToScan = document.getElementById('tap-to-scan');
-    if (tapToScan) {
-        tapToScan.textContent = clue.tapButtonText;
-    }
-}
+let clueURL = params.get('clue');
 
 // load seenClues from localStorage
 let seenClues = JSON.parse(localStorage.getItem('seenClues')) || {};
 
-let pokemonDataLoaded = false;
-let totalPokemon = 1010; // as of current PokeAPI data
+function processClueData() {
+    if (clueURL) {
+        //load clue data
+        const clue = clueData[clueURL];
 
-// declare audio variables
-let cryUrl = '';
-window.currentCryAudio = null;
-window.currentVoiceAudio = null;
+        if (clue.requiredClue) {
+            //if required clue is not in seenClues, return
+            if (!seenClues[clue.requiredClue]) {
+                console.log('Required clue not seen yet:', clue.requiredClue);
+                clueURL = null;
+                if (clue.failedHint) {
+                    // show failed hint in a bulma alert
+                    hintURL = clue.failedHint;
+                    bulmaAlert('Hint', clue.failedHint, 'is-danger');
+                    playAlertBeep();
+                }
+                return;
+            }
+            else {
+                if (clue.successHint) {
+                    // show success hint in a bulma alert                    
+                    bulmaAlert('Success', clue.successHint, 'is-success');
+                    if (clue.successExtraHint) {
+                        hintURL = clue.successExtraHint;
+                    }
+                }
+            }
+        }
+
+
+        //change tap-to-scan text to clues tap text
+        const tapToScan = document.getElementById('tap-to-scan');
+        if (tapToScan) {
+            tapToScan.textContent = clue.tapButtonText;
+        }
+
+        //if clue has a sprite, change pokemon-sprite to that sprite
+        if (clue.sprite) {
+            const spriteImg = document.getElementById('pokemon-sprite');
+            if (spriteImg) {
+                spriteImg.src = clue.sprite;
+                pokemonDataLoaded = true;
+                showPokedexData();
+            }
+        }
+
+        //if clue has a cryUrl, change pokemon-cry to that url
+        if (clue.cryUrl) {
+            cryUrl = clue.cryUrl;
+        }
+
+        //if clue has a nameOverride, change pokemon-name to that name
+        if (clue.nameOverride) {
+            const nameElem = document.getElementById('pokemon-name');
+            if (nameElem) {
+                nameElem.textContent = clue.nameOverride;
+            }
+            //hide pokemon number and type
+            document.getElementById('pokemon-num-type').classList.add('hidden');
+
+        }
+        else {
+            document.getElementById('pokemon-num-type').classList.remove('hidden');
+        }
+
+        //if clue has a descriptionOverride, change pokemon-description to that description
+        if (clue.descriptionOverride) {
+            const descriptionElem = document.getElementById('pokemon-description');
+            if (descriptionElem) {
+                descriptionElem.innerHTML = clue.descriptionOverride;
+            }
+        }
+    }
+}
+processClueData();
+
 
 // Fetch Pokémon data from PokeAPI
 function fetchPokemonData(pokemonNumber) {
+    if (pokemonNumber === 0) return;
+
     if (pokemonNumber) {
+
         fetch(`https://pokeapi.co/api/v2/pokemon/${pokemonNumber}`)
             .then(response => response.json())
             .then(data => {
@@ -256,7 +361,8 @@ const playCry = () => {
     if (window.currentCryAudio && !window.currentCryAudio.paused) {
         window.currentCryAudio.currentTime = 0;
     } else {
-        window.currentCryAudio = new Audio(cryUrl);
+        window.currentCryAudio = new Audio(cryUrl);        
+        window.currentCryAudio.volume = 0.75;
         window.currentCryAudio.play();
     }
     // make the pokemon sprite shake
@@ -288,6 +394,12 @@ const playDescription = () => {
     }
     else {
         const utterance = new SpeechSynthesisUtterance(document.getElementById('btn-description').dataset.verbiage);
+
+        //if speechSynthesis is currently speaking, stop it
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            return;
+        }
 
         if (navigator.userAgent.includes('Windows')) {
             utterance.rate = 2;
@@ -421,8 +533,11 @@ function playClueAudio(clueCode) {
         window.currentVoiceAudio.pause();
         return;
     }
-    window.currentVoiceAudio = new Audio(`assets/clue/${clue.audioCode}.wav`);
-    window.currentVoiceAudio.play();
+
+    if (clue.audioFile) {
+        window.currentVoiceAudio = new Audio(`assets/clue/${clue.audioFile}`);
+        window.currentVoiceAudio.play();
+    }
 
     //show translation text if available
     const translationTextElem = document.getElementById('translation-text');
@@ -480,6 +595,35 @@ function playBeep() {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.1);
+}
+
+
+// play alert beep sound effect that is two rising beeps
+function playAlertBeep() {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+
+    osc.frequency.setValueAtTime(440, ctx.currentTime); // first beep
+    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1);
+    osc.onended = () => {
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = "square";
+        osc2.frequency.setValueAtTime(660, ctx.currentTime); // second beep
+        gain2.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start();
+        osc2.stop(ctx.currentTime + 0.1);
+    };
 }
 
 //if dpad left is pressed, go to previous pokemon entry

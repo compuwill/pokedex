@@ -304,6 +304,7 @@ body {
 .screen {
     /* flex-grow: 1; */
     /* height: 52vh; */
+    height: 100%;
     background-color: #4f4f4f;
     border-radius: 0.6vh;
     border: 0.6vh solid #afafaf;
