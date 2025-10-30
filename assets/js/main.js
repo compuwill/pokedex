@@ -814,9 +814,9 @@ function adjustForSmallScreens() {
         //if offscreen, adjust position to top right of screen
         specialButtons.style.position = 'absolute';
         specialButtons.style.top = '10px';
-        specialButtons.style.right = '10px';
-        
+        specialButtons.style.right = '10px';        
     }
+
 }
 
 adjustForSmallScreens();
