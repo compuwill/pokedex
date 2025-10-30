@@ -112,7 +112,8 @@ And please forget you saw me here. Blorp…!`,
         nameOverride: 'Translation Module',
         descriptionOverride: `<ul><li>A special translation module for the Pokédex.</li>
 <li>Enables translation of Pokémon that want to communicate.</li></ul>`,
-        cryUrl: 'assets/clue/module-found.mp3'
+        cryUrl: 'assets/clue/module-found.mp3',
+        hintURL: 'I should use this on that Ditto I saw earlier to see if it can help me understand what it\'s saying.',
     }
 
 };
@@ -152,6 +153,9 @@ function processClueData() {
             }
         }
 
+        if (clue.hintURL) {
+            hintURL = clue.hintURL;
+        }
 
         //change tap-to-scan text to clues tap text
         const tapToScan = document.getElementById('tap-to-scan');
