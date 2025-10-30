@@ -7,7 +7,7 @@
 //cache all audio files by creating Audio objects
 const audioUrls = [
     'assets/clue/bathroom-ditto.wav',
-    'assets/clue/module-found.mp3',
+    'assets/clue/item-found.mp3',
     'assets/voice/001.wav',
     'assets/voice/004.wav',
     'assets/voice/007.wav',
@@ -108,13 +108,45 @@ And please forget you saw me here. Blorp…!`,
     'module-found': {
         tapButtonText: 'Tap to Install',
         transcript: `Oh! You found it! The missing module!`,
-        sprite: 'assets/images/pokedex-chip.png',
+        sprite: 'assets/images/chip.png',
         nameOverride: 'Translation Module',
         descriptionOverride: `<ul><li>A special translation module for the Pokédex.</li>
 <li>Enables translation of Pokémon that want to communicate.</li></ul>`,
-        cryUrl: 'assets/clue/module-found.mp3',
+        cryUrl: 'assets/clue/item-found.mp3',
         hintURL: 'I should use this on that Ditto I saw earlier to see if it can help me understand what it\'s saying.',
-    }
+    },
+    'pokedex-obtained': {
+        tapButtonText: 'Tap to Use',
+        transcript: `Oh! You obtained the Pokédex!`,
+        sprite: 'assets/images/pokedex.png',
+        nameOverride: 'Pokédex',
+        descriptionOverride: `<ul><li>A high-tech encyclopedia for Pokémon.</li>
+<li>Contains data on all known Pokémon species.</li></ul>`,
+        cryUrl: 'assets/clue/item-found.mp3',
+        hintURL: 'I should try using the Pokédex on that Ditto I saw earlier.',
+    },
+    'nurse-joy': {
+        audioFile: 'healing.mp3',
+        tapButtonText: 'Tap to Use',
+        transcript: `Nurse Joy heals your Pokémon back to full health!`,
+        sprite: 'assets/images/hyper-potion.png',
+        nameOverride: 'Hyper Potion',
+        descriptionOverride: `<ul><li>A spray-type medicine for treating wounds.</li>
+<li>It can restore a Pokémon's HP by 200 points.</li></ul>`,
+        cryUrl: 'assets/clue/item-found.mp3',
+        hintURL: 'This doesn\'t really impact the scavenger hunt, but it\'s good to know Nurse Joy is here to help!',
+    },
+    'premier-ball': {
+        audioFile: 'victory-theme.mp3',
+        tapButtonText: 'Tap to Obtain',
+        transcript: `You found the missing Premier Ball! Please close the pokéball leaving the NFC card inside and show this screen to Brock to complete your mission and receive your reward!`,
+        sprite: 'assets/images/premier-ball.png',
+        nameOverride: 'Premier Ball',
+        descriptionOverride: `<ul><li>A special Poké Ball designed for catching Pokémon.</li>
+<li>It works better than a regular Poké Ball.</li></ul>`,
+        cryUrl: 'assets/clue/item-received.mp3',
+        failedHint: 'Hey cheater! You found the Premier Ball before completing the scavenger hunt! Go back and find all the clues first!'
+    },
 
 };
 
