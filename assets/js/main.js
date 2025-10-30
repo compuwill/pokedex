@@ -203,6 +203,8 @@ function processClueData() {
 }
 processClueData();
 
+//shiny url parameter
+const shinyParam = params.get('shiny');
 
 // Fetch Pokémon data from PokeAPI
 function fetchPokemonData(pokemonNumber) {
@@ -215,7 +217,21 @@ function fetchPokemonData(pokemonNumber) {
             .then(data => {
                 console.log('Fetched Pokémon Data:', data);
 
-                const spriteUrl = data.sprites.front_default;
+                var spriteUrl = data.sprites.front_default;
+
+                if (shinyParam === 'true' || shinyParam === '1') {
+                    //check if shiny sprite exists
+                    if (data.sprites.front_shiny) {
+                        spriteUrl = data.sprites.front_shiny;
+                        //add shiny sparkle effect to pokemon-sprite
+                        const spriteImg = document.getElementById('pokemon-sprite');
+                        if (spriteImg) {
+                            // spriteImg.classList.add('shiny');
+                        }
+                    }
+                }
+                
+
                 const spriteImg = document.getElementById('pokemon-sprite');
                 if (spriteImg && spriteUrl) {
                     spriteImg.src = spriteUrl;
@@ -460,6 +476,11 @@ document.getElementById('tap-to-scan').addEventListener('click', () => {
 
     document.getElementById('tap-to-scan').style.display = 'none';
     document.getElementById('pokemon-sprite').classList.remove('black-filter');
+
+    //if shinyParam is set, add shiny-wrapper class to pokemon-effect
+    if (shinyParam === 'true' || shinyParam === '1') {
+        document.getElementById('pokemon-effect').classList.add('shiny-wrapper');
+    }
 
     setTimeout(() => {
         //perform click on btn-battlecry

@@ -16,7 +16,8 @@
         rel="stylesheet">
 
     <!-- Material Icons -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
 </head>
 
@@ -56,19 +57,37 @@
                     <div class="screen">
                         <div class="screen-content" id="screen-content">
                             <div class="screen-scroller p-3">
-                            <h1 class="title has-text-centered overlap" id="tap-to-scan">Tap To Scan</h1>
+                                <h1 class="title has-text-centered overlap" id="tap-to-scan">Tap To Scan</h1>
 
-                            <img id="pokemon-sprite" class="black-filter shrink" src="" alt="">
-                            <span id="translation-text" class="pokedex-text is-flex is-justify-content-center is-size-4 has-text-centered mb-6"></span>
-                            <h2 id="pokemon-name" class="title pokedex-text has-text-centered mb-0 hidden is-size-2">Loading...</h2>
-                            <h3 id="pokemon-num-type"
-                                class="pokedex-text hidden has-text-centered is-size-3 is-flex is-align-items-center is-justify-content-center mb-2">
-                                <p id="pokemon-number">#---</p>
-                                <p id="pokemon-type">Loading...</p>
-                            </h3>
-                            <ul id="pokemon-description" class="pokedex-text hidden is-size-5">
-                                <li>Loading...</li>
-                            </ul>
+                                <!-- <img id="pokemon-sprite" class="black-filter shrink" src="" alt=""> -->
+                                <div id="pokemon-effect" class="">
+                                    <img id="pokemon-sprite" class="black-filter shrink" src="" alt="">
+                                    <div class="shiny-stars">
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                        <div class="shiny-star"></div>
+                                    </div>
+                                </div>
+
+                                <span id="translation-text"
+                                    class="pokedex-text is-flex is-justify-content-center is-size-4 has-text-centered mb-6"></span>
+                                <h2 id="pokemon-name"
+                                    class="title pokedex-text has-text-centered mb-0 hidden is-size-2">Loading...</h2>
+                                <h3 id="pokemon-num-type"
+                                    class="pokedex-text hidden has-text-centered is-size-3 is-flex is-align-items-center is-justify-content-center mb-2">
+                                    <p id="pokemon-number">#---</p>
+                                    <p id="pokemon-type">Loading...</p>
+                                </h3>
+                                <ul id="pokemon-description" class="pokedex-text hidden is-size-5">
+                                    <li>Loading...</li>
+                                </ul>
                             </div>
                             <div class="screen-scanlines"></div>
                         </div>
@@ -100,7 +119,7 @@
         <div class="controls pb-6">
             <div class="buttons-left">
                 <div class="h-stack-buttons">
-                    <div id="btn-gray" class="circle-btn gray is-unselectable"></div>                    
+                    <div id="btn-gray" class="circle-btn gray is-unselectable"></div>
                     <div id="btn-red" class="rect-btn red"></div>
                     <div id="btn-blue" class="rect-btn blue"></div>
                 </div>
@@ -127,4 +146,5 @@
 </body>
 <script defer src="assets/js/helpers.js"></script>
 <script defer src="assets/js/main.js"></script>
+
 </html>

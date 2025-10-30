@@ -676,3 +676,148 @@ body {
         transform: translate(0, 0) rotate(0deg);
     }
 }
+
+
+
+/* 
+Example shiny HTML usage:
+<div class="shiny-wrapper">
+    <img id="pokemon-sprite" src="..." alt="Pokemon">
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+        <div class="shiny-star"></div>
+</div>
+*/
+
+/* Shiny Animation */
+#pokemon-effect {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.shiny-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.shiny-wrapper .shiny-star {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 2.5vw;
+    height: 2.5vw;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+    animation: shiny-burst 0.9s cubic-bezier(0.4, 1.6, 0.6, 1) forwards;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.shiny-wrapper .shiny-star:nth-child(2) {
+    animation-delay: 0.05s;
+    --angle: 0deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(3) {
+    animation-delay: 0.10s;
+    --angle: 40deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(4) {
+    animation-delay: 0.15s;
+    --angle: 80deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(5) {
+    animation-delay: 0.20s;
+    --angle: 120deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(6) {
+    animation-delay: 0.25s;
+    --angle: 160deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(7) {
+    animation-delay: 0.30s;
+    --angle: 200deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(8) {
+    animation-delay: 0.35s;
+    --angle: 240deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(9) {
+    animation-delay: 0.40s;
+    --angle: 280deg;
+}
+
+.shiny-wrapper .shiny-star:nth-child(10) {
+    animation-delay: 0.45s;
+    --angle: 320deg;
+}
+
+@keyframes shiny-burst {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+        filter: brightness(2) blur(1px);
+    }
+
+    20% {
+        opacity: 0.2;
+        transform: translate(-50%, -50%) scale(1.1) rotate(10deg);
+        filter: brightness(2.5) blur(0.5px);
+    }
+
+    60% {
+        opacity: 1;
+        /* Burst outward along angle - widened */
+        transform: translate(calc(-50% + 17vw * cos(var(--angle, 0deg))),
+                calc(-50% + 17vw * sin(var(--angle, 0deg)))) scale(1) rotate(20deg);
+        filter: brightness(1.5);
+    }
+
+    80% {
+        opacity: 0.7;
+        filter: brightness(1);
+    }
+
+    100% {
+        opacity: 0;
+        /* End further out - widened */
+        transform: translate(calc(-50% + 25vw * cos(var(--angle, 0deg))),
+                calc(-50% + 25vw * sin(var(--angle, 0deg)))) scale(0.7) rotate(40deg);
+        filter: brightness(0.7) blur(2px);
+    }
+}
+
+/* Star SVG as background-image, only visible inside .shiny-wrapper */
+.shiny-wrapper .shiny-star {
+    background: none;
+}
+
+.shiny-wrapper .shiny-star::before {
+    content: "";
+    display: block;
+    width: 200%;
+    height: 200%;
+    background: none;
+    /* 4-pointed star SVG, white fill, cyan outline with thicker stroke */
+    mask: url('data:image/svg+xml;utf8,<svg width="32" height="32" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg"><polygon points="16,2 18,14 30,16 18,18 16,30 14,18 2,16 14,14" stroke="cyan" stroke-width="4" fill="white" /></svg>') center/contain no-repeat;
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg width="32" height="32" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg"><polygon points="16,2 18,14 30,16 18,18 16,30 14,18 2,16 14,14" stroke="cyan" stroke-width="4" fill="white" /></svg>') center/contain no-repeat;
+    background-color: white;
+    box-shadow: 0 0 6px 2px #00eaff99;
+    border-radius: 50%;
+    border: 5px solid rgb(24, 236, 236);
+}
