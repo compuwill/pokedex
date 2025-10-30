@@ -124,7 +124,7 @@ function fetchPokemonData(pokemonNumber) {
                 // display pokemon number and type(s)
                 const numElem = document.getElementById('pokemon-number');
                 if (numElem) {
-                    numElem.textContent = `#${String(data.id).padStart(3, '0')}`;
+                    numElem.textContent = `#${String(data.id).padStart(4, '0')}`;
                 }
                 const typeElem = document.getElementById('pokemon-type');
                 if (typeElem) {

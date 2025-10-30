@@ -43,7 +43,7 @@ body {
 }
 
 .tag {
-    height: unset!important;
+    height: unset !important;
 }
 
 /* Pokedex Container */
@@ -303,11 +303,12 @@ body {
 /* Screen (gray area) */
 .screen {
     /* flex-grow: 1; */
-    height: 52vh;
+    /* height: 52vh; */
     background-color: #4f4f4f;
     border-radius: 0.6vh;
     border: 0.6vh solid #afafaf;
     margin: 2vh 0;
+    overflow: hidden;
 }
 
 .screen-content {
@@ -320,11 +321,15 @@ body {
     font-weight: 400;
     font-style: normal;
     position: relative;
-    overflow: hidden;
-    overflow-y: auto;
+
     opacity: 0;
     animation-delay: 1s;
     animation: screen-fade-in 0.7s ease forwards;
+}
+
+.screen-scroller {
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 @keyframes screen-fade-in {
@@ -332,6 +337,7 @@ body {
         opacity: 0;
         background-color: #000;
     }
+
     to {
         opacity: 1;
         background-color: #f8f8f8;
@@ -454,6 +460,7 @@ body {
     transition: box-shadow 0.1s, transform 0.1s;
     position: relative;
 }
+
 .rect-btn.red:active {
     box-shadow: 0 1px 0 #b71c1c, 0 2px 4px #20202033;
     transform: translateY(2px);
@@ -467,6 +474,7 @@ body {
     transition: box-shadow 0.1s, transform 0.1s;
     position: relative;
 }
+
 .rect-btn.blue:active {
     box-shadow: 0 1px 0 #1565c0, 0 2px 4px #20202033;
     transform: translateY(2px);
@@ -494,21 +502,23 @@ body {
     /* LCD scanlines */
     overflow: hidden;
 }
+
 .bar-btn::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: repeating-linear-gradient(
-        to bottom,
-        rgba(80, 120, 60, 0.08) 0px,
-        rgba(80, 120, 60, 0.08) 2px,
-        transparent 2px,
-        transparent 6px
-    );
+    background: repeating-linear-gradient(to bottom,
+            rgba(80, 120, 60, 0.08) 0px,
+            rgba(80, 120, 60, 0.08) 2px,
+            transparent 2px,
+            transparent 6px);
     z-index: 1;
 }
-.bar-btn span, .bar-btn strong, .bar-btn b {
+
+.bar-btn span,
+.bar-btn strong,
+.bar-btn b {
     position: relative;
     z-index: 2;
     font-family: inherit;
@@ -594,13 +604,14 @@ body {
         transform: translateY(0) scale(1);
         filter: none;
     }
+
     100% {
         transform: translateY(-8%) scale(1.04);
         filter: drop-shadow(0 2px 4px #ffeb3b88);
     }
 }
 
-.shrink {    
+.shrink {
     transform: scale(0);
 }
 
@@ -612,6 +623,7 @@ body {
     opacity: 1;
     transition: opacity 0.3s ease;
 }
+
 .pokedex-text.hidden {
     opacity: 0;
 }
@@ -627,7 +639,7 @@ body {
     gap: 2px;
 }
 
-#pokemon-description ul{
+#pokemon-description ul {
     list-style: square;
     padding-left: 0.75em;
 }
