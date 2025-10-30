@@ -818,4 +818,11 @@ function adjustForSmallScreens() {
         
     }
 }
+
 adjustForSmallScreens();
+
+window.addEventListener('resize', adjustForSmallScreens);
+
+setTimeout(() => {
+    adjustForSmallScreens();
+}, 1000);
