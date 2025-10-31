@@ -105,9 +105,24 @@ And please forget you saw me here. Blorp…!`,
         successHint: 'With the translation module installed, I can understand what Ditto is saying!',
         successExtraHint: 'Ditto mentioned a flickering light. Maybe I should investigate that next. Could it be a Pokémon?',
     },
+    'fireplace-charmander': {
+        audioFile: 'fireplace-charmander.wav',
+        tapButtonText: 'Tap to Communicate',
+        transcript: `Oh that Drifloon? Yeah, I saw it floatin' around here earlier with a Team Rocket member. They were chasing a pikachu but it electrocuted the rocket guy... I kinda saw him turn into a Gengar after that... yeah THAT gengar over there!`,
+        requiredClue: 'bathroom-ditto',
+        successHint: 'You use the translator module to ask Charmander about the Drifloon.',
+        successExtraHint: 'Charmander mentioned a Team Rocket member turning into a Gengar. Maybe I should check out that Gengar next.',
+    },
+    'gengar-ghost': {
+        audioFile: 'gengar-rocket.mp3',
+        tapButtonText: 'Tap to Interrogate',
+        transcript: `Hehehe... So you found me, did you? Team Rocket's plans are always foiled by that pesky Pikachu and his friends! ...But I'm dead now, so I guess it doesn't matter anymore... Sigh... Can you grant me one last favor? I just want to hold a pokédex one last time... with my real body's hand. Do that and I'll give you the Premier Ball you want so badly.`,
+        requiredClue: 'fireplace-charmander',
+        successExtraHint: 'The Gengar mentioned wanting to hold a Pokédex in his original body. I should tap my Pokédex to his hand.',
+    },
     'module-found': {
         tapButtonText: 'Tap to Install',
-        transcript: `Oh! You found it! The missing module!`,
+        transcript: `Oh! You found it! The missing module! You can now use this to translate Pokémon that want to communicate!`,
         sprite: 'assets/images/chip.png',
         nameOverride: 'Translation Module',
         descriptionOverride: `<ul><li>A special translation module for the Pokédex.</li>
@@ -117,11 +132,12 @@ And please forget you saw me here. Blorp…!`,
     },
     'pokedex-obtained': {
         tapButtonText: 'Tap to Use',
-        transcript: `Oh! You obtained the Pokédex!`,
+        transcript: `You obtained the Pokédex!`,
         sprite: 'assets/images/pokedex.png',
         nameOverride: 'Pokédex',
         descriptionOverride: `<ul><li>A high-tech encyclopedia for Pokémon.</li>
-<li>Contains data on all known Pokémon species.</li></ul>`,
+<li>Contains data on all known Pokémon species.</li>
+<li>⚠ ALERT: Pokédex Translator Module missing.</li></ul>`,
         cryUrl: 'assets/clue/item-found.mp3',
         hintURL: 'I should try using the Pokédex on that Ditto I saw earlier.',
     },
@@ -139,13 +155,14 @@ And please forget you saw me here. Blorp…!`,
     'premier-ball': {
         audioFile: 'victory-theme.mp3',
         tapButtonText: 'Tap to Obtain',
-        transcript: `You found the missing Premier Ball! Please close the pokéball leaving the NFC card inside and show this screen to Brock to complete your mission and receive your reward!`,
+        transcript: `You found the missing Premier Ball! Please show this screen to Brock to complete your mission and receive your reward!`,
         sprite: 'assets/images/premier-ball.png',
         nameOverride: 'Premier Ball',
         descriptionOverride: `<ul><li>A special Poké Ball designed for catching Pokémon.</li>
 <li>It works better than a regular Poké Ball.</li></ul>`,
         cryUrl: 'assets/clue/item-received.mp3',
-        failedHint: 'Hey cheater! You found the Premier Ball before completing the scavenger hunt! Go back and find all the clues first!'
+        requiredClue: 'gengar-ghost',
+        failedHint: 'Hey cheater! Go back and find all the clues first!'
     },
 
 };
@@ -178,9 +195,10 @@ function processClueData() {
                 if (clue.successHint) {
                     // show success hint in a bulma alert                    
                     bulmaAlert('Success', clue.successHint, 'is-success');
-                    if (clue.successExtraHint) {
-                        hintURL = clue.successExtraHint;
-                    }
+
+                }
+                if (clue.successExtraHint) {
+                    hintURL = clue.successExtraHint;
                 }
             }
         }
@@ -262,7 +280,7 @@ function fetchPokemonData(pokemonNumber) {
                         }
                     }
                 }
-                
+
 
                 const spriteImg = document.getElementById('pokemon-sprite');
                 if (spriteImg && spriteUrl) {
@@ -413,7 +431,7 @@ const playCry = () => {
     if (window.currentCryAudio && !window.currentCryAudio.paused) {
         window.currentCryAudio.currentTime = 0;
     } else {
-        window.currentCryAudio = new Audio(cryUrl);        
+        window.currentCryAudio = new Audio(cryUrl);
         window.currentCryAudio.volume = 0.75;
         window.currentCryAudio.play();
     }
@@ -846,7 +864,7 @@ function adjustForSmallScreens() {
         //if offscreen, adjust position to top right of screen
         specialButtons.style.position = 'absolute';
         specialButtons.style.top = '10px';
-        specialButtons.style.right = '10px';        
+        specialButtons.style.right = '10px';
     }
 
 }
