@@ -79,6 +79,9 @@ if (!pokemonNumber) {
                 pokemonNumber = data.id;
                 console.log('Pokedex Entry from Name:', pokemonNumber);
                 fetchPokemonData(pokemonNumber);
+
+                //update URL without reloading page
+                window.history.pushState({}, '', `?entry=${pokemonNumber}`);
             });
     }
 }
