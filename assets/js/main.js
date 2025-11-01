@@ -104,7 +104,7 @@ It—uh—drifted that way! Toward a flickering light! For, um… warmth? Yeah.
 
 And please forget you saw me here. Blorp…!`,
         requiredClue: 'module-found',
-        failedHint: 'Woah! It seems like its trying to speak with me. I need a translation module.',
+        failedHint: 'Woah! It seems like its trying to speak with me. I need to FIND the translation module.',
         successHint: 'With the translation module installed, I can understand what Ditto is saying!',
         successExtraHint: 'Ditto mentioned a flickering light. Maybe I should investigate that next. Could it be a Pokémon?',
     },
