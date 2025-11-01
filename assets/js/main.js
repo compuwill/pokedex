@@ -173,8 +173,21 @@ Heh… I didn't go. I'd… melt…`,
         nameOverride: 'Professor Oak',
         descriptionOverride: `<ul><li>The leading Pokémon researcher.</li>
 <li>Known for his expertise in Pokémon behavior.</li></ul>`,
-        cryUrl: 'assets/clue/pc-on.mp3',
+        cryUrl: 'assets/clue/a-button.mp3',
         hintURL: 'This doesn\'t really impact the scavenger hunt, but it\'s good to know Professor Oak is here to help!',
+    },
+    'james': {
+        audioFile: 'team-rocket.mp3',
+        tapButtonText: 'Tap to Talk',
+        transcript: `Team Rocket's blasting off again! Oh no, you found me! Well, I guess I can help you out... One of my comrades gave me this note. I have no idea what it means, but maybe it can help you!`,
+        sprite: 'assets/images/james.png',
+        nameOverride: 'James (Team Rocket)',
+        descriptionOverride: `<ul><li>A member of Team Rocket.</li>
+        <li>Often partners with Jessie and Meowth.</li>
+<li>Known for his flamboyant personality and loyalty to his friends.</li>
+</ul>`,
+        cryUrl: 'assets/clue/a-button.mp3',
+        hintURL: 'James gave me a note. It seems to be some kind of code... I should try to decipher it using my surroundings.',
     },
     'premier-ball': {
         audioFile: 'victory-theme.mp3',
