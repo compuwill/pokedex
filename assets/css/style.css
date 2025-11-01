@@ -394,6 +394,11 @@ body {
 
 .circle-btn.gray {
     background: radial-gradient(circle at 60% 40%, #bdbdbd 0%, #616161 70%, #212121 100%);
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
 }
 
 .circle-btn:active {
@@ -821,4 +826,24 @@ Example shiny HTML usage:
     box-shadow: 0 0 6px 2px #00eaff99;
     border-radius: 50%;
     border: 5px solid rgb(24, 236, 236);
+}
+
+
+
+
+
+
+.highlight-hint {
+    animation: highlight-hint-pulse 1.5s infinite;
+    color: #ffeb3b;
+}
+@keyframes highlight-hint-pulse {
+    0%,
+    100% {
+        box-shadow: 0 0 10px 2px #ffeb3b88;
+    }
+
+    50% {
+        box-shadow: 0 0 20px 6px #ffeb3bcc;
+    }
 }

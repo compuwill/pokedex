@@ -96,13 +96,15 @@ const clueData = {
     'bathroom-ditto': {
         audioFile: 'bathroom-ditto.wav',
         tapButtonText: 'Tap to Translate',
-        transcript: `Ah—! "What... am I doing here?" I—I was just… uhh… reshaping! Yeah! Just… reshaping!! Heh… heheh…
+        transcript: `Huh…? You… you can hear me…? Whoa… thaaat's… weird…
 
-Oh! Right! The—uh—floaty one! The balloon ghost thing?
+Ah! You're looking for… uh. the-uh-floaty one! the balloon ghost thing?
 
-It—uh—drifted that way! Toward a flickering light! For, um… warmth? Yeah.
+Yeah. It… took your... shiny… ball. 
 
-And please forget you saw me here. Blorp…!`,
+And it drifted… that way! toward a warm... flicky… light.
+
+Heh… I didn't go. I'd… melt…`,
         requiredClue: 'module-found',
         failedHint: 'Woah! It seems like its trying to speak with me. I need to FIND the translation module.',
         successHint: 'With the translation module installed, I can understand what Ditto is saying!',
@@ -142,7 +144,7 @@ And please forget you saw me here. Blorp…!`,
 <li>Contains data on all known Pokémon species.</li>
 <li>⚠ ALERT: Pokédex Translator Module missing.</li></ul>`,
         cryUrl: 'assets/clue/item-found.mp3',
-        hintURL: 'I should try using the Pokédex on that Ditto I saw earlier.',
+        hintURL: 'I should use this on a drifloon.',
     },
     'nurse-joy': {
         audioFile: 'healing.mp3',
@@ -208,6 +210,7 @@ function processClueData() {
 
         if (clue.hintURL) {
             hintURL = clue.hintURL;
+            
         }
 
         //change tap-to-scan text to clues tap text
@@ -255,6 +258,11 @@ function processClueData() {
     }
 }
 processClueData();
+
+//if hintURL is set, change btn-gray text to HINT
+if( hintURL ) {
+    document.getElementById('btn-gray').innerHTML = 'HINT'
+}
 
 //shiny url parameter
 const shinyParam = params.get('shiny');
@@ -879,3 +887,11 @@ window.addEventListener('resize', adjustForSmallScreens);
 setTimeout(() => {
     adjustForSmallScreens();
 }, 1000);
+
+
+// if 3 minutes pass highlight the hint button
+setTimeout(() => {
+    if (!hintURL) return;
+    const hintButton = document.getElementById('btn-gray');
+    hintButton.classList.add('highlight-hint');
+}, 180000);
