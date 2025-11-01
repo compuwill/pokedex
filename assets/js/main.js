@@ -38,6 +38,9 @@ const pokemonDescriptions = {
     425: `<li>A Pokémon formed by the spirits of people and other Pokémon. It loves damp, humid places.</li>
           <li>Children holding them sometimes vanish.</li>
           <li>Stories go that it grabs the hands of small children and drags them away to the afterlife.</li>`,
+    25: `<li>When several of these Pokémon gather, their electricity could build and cause lightning storms.</li>
+          <li>This intelligent Pokémon roasts hard berries with electricity to make them tender enough to eat.</li>
+          <li>Lives in forests away from people. It stores electricity in its cheeks for zapping an enemy if it is attacked.</li>`,
 
 };
 
