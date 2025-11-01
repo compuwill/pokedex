@@ -274,6 +274,7 @@ if( hintURL ) {
 
 //shiny url parameter
 const shinyParam = params.get('shiny');
+const animatedParam = params.get('animated');
 
 // Fetch Pokémon data from PokeAPI
 function fetchPokemonData(pokemonNumber) {
@@ -300,6 +301,18 @@ function fetchPokemonData(pokemonNumber) {
                     }
                 }
 
+                if (animatedParam === 'true' || animatedParam === '1') {
+                    //check if animated sprite exists
+                    if (data.sprites.versions['generation-v']['black-white'].animated.front_default) {
+                        spriteUrl = data.sprites.versions['generation-v']['black-white'].animated.front_default;
+                        //add animation effect to pokemon-sprite
+                        const spriteImg = document.getElementById('pokemon-sprite');
+                        if (spriteImg) {
+                            //make the image use the original size of the animated sprite
+                            spriteImg.classList.add('animated');
+                        }
+                    }
+                }
 
                 const spriteImg = document.getElementById('pokemon-sprite');
                 if (spriteImg && spriteUrl) {
@@ -637,7 +650,7 @@ function playClueAudio(clueCode) {
     const translationTextElem = document.getElementById('translation-text');
     if (translationTextElem && clue.transcript) {
         translationTextElem.textContent = `(${clue.transcript})`;
-        translationTextElem.classList.remove('hidden');
+        translationTextElem.classList.remove('is-hidden');
     }
 
     //add a speaking animation to the pokemon sprite
