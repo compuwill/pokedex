@@ -165,6 +165,17 @@ Heh… I didn't go. I'd… melt…`,
         cryUrl: 'assets/clue/item-found.mp3',
         hintURL: 'This doesn\'t really impact the scavenger hunt, but it\'s good to know Nurse Joy is here to help!',
     },
+    'professor-oak': {
+        audioFile: 'professor-oak.mp3',
+        tapButtonText: 'Tap to Talk',
+        transcript: `Hello there! Welcome to the world of Pokémon! My name is Oak. People call me the Pokémon Professor.`,
+        sprite: 'assets/images/professor-oak.png',
+        nameOverride: 'Professor Oak',
+        descriptionOverride: `<ul><li>The leading Pokémon researcher.</li>
+<li>Known for his expertise in Pokémon behavior.</li></ul>`,
+        cryUrl: 'assets/clue/pc-on.mp3',
+        hintURL: 'This doesn\'t really impact the scavenger hunt, but it\'s good to know Professor Oak is here to help!',
+    },
     'premier-ball': {
         audioFile: 'victory-theme.mp3',
         tapButtonText: 'Tap to Obtain',
@@ -221,6 +232,11 @@ function processClueData() {
             
         }
 
+        if (clueURL == 'professor-oak')
+        {
+            document.getElementById('pokemon-sprite').classList.add('my-0');
+        }
+
         //change tap-to-scan text to clues tap text
         const tapToScan = document.getElementById('tap-to-scan');
         if (tapToScan) {
@@ -247,13 +263,15 @@ function processClueData() {
             const nameElem = document.getElementById('pokemon-name');
             if (nameElem) {
                 nameElem.textContent = clue.nameOverride;
+                nameElem.classList.remove('mb-0');
+                nameElem.classList.add('mb-2');
             }
             //hide pokemon number and type
-            document.getElementById('pokemon-num-type').classList.add('hidden');
+            document.getElementById('pokemon-num-type').classList.add('is-hidden');
 
         }
         else {
-            document.getElementById('pokemon-num-type').classList.remove('hidden');
+            document.getElementById('pokemon-num-type').classList.remove('is-hidden');
         }
 
         //if clue has a descriptionOverride, change pokemon-description to that description
@@ -261,6 +279,7 @@ function processClueData() {
             const descriptionElem = document.getElementById('pokemon-description');
             if (descriptionElem) {
                 descriptionElem.innerHTML = clue.descriptionOverride;
+                document.getElementById('btn-description').dataset.verbiage = clue.nameOverride + '. ' + descriptionElem.textContent.replace(/<\/?ul>|<\/?li>/g, '').replace(/\n/g, ' ');
             }
         }
     }
@@ -649,7 +668,7 @@ function playClueAudio(clueCode) {
     //show translation text if available
     const translationTextElem = document.getElementById('translation-text');
     if (translationTextElem && clue.transcript) {
-        translationTextElem.textContent = `(${clue.transcript})`;
+        translationTextElem.textContent = `${clue.transcript}`;
         translationTextElem.classList.remove('is-hidden');
     }
 
@@ -831,6 +850,9 @@ document.getElementById('btn-gray').addEventListener('click', () => {
     if (hintURL) {
         bulmaAlert('Hint', hintURL, 'is-danger');
     }
+
+    const hintButton = document.getElementById('btn-gray');
+    hintButton.classList.remove('highlight-hint');
 
 });
 
