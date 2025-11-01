@@ -7,7 +7,12 @@
 //cache all audio files by creating Audio objects
 const audioUrls = [
     'assets/clue/bathroom-ditto.wav',
+    'assets/clue/fireplace-charmander.wav',
+    'assets/clue/gengar-rocket.mp3',
+    'assets/clue/item-received.mp3',
+    'assets/clue/victory-theme.mp3',
     'assets/clue/item-found.mp3',
+    'assets/clue/healing.mp3',
     'assets/voice/001.wav',
     'assets/voice/004.wav',
     'assets/voice/007.wav',
@@ -888,8 +893,19 @@ setTimeout(() => {
     adjustForSmallScreens();
 }, 1000);
 
+// store page load time
+const pageLoadTime = Date.now();
 
-// if 3 minutes pass highlight the hint button
+//if page is refocused, check if 3 minutes have passed since page load to highlight hint button
+window.addEventListener('focus', () => {
+    if (!hintURL) return;
+    const hintButton = document.getElementById('btn-gray');
+    if (Date.now() - pageLoadTime >= 180000) {
+        hintButton.classList.add('highlight-hint');
+    }
+});
+
+//if 3 minutes have passed since page load, highlight hint button
 setTimeout(() => {
     if (!hintURL) return;
     const hintButton = document.getElementById('btn-gray');
