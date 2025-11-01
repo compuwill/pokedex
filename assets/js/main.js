@@ -103,7 +103,7 @@ const clueData = {
         tapButtonText: 'Tap to Translate',
         transcript: `Huh…? You… you can hear me…? Whoa… thaaat's… weird…
 
-Ah! You're looking for… uh. the-uh-floaty one! the balloon ghost thing?
+Ah! You're looking for… uh. the floaty one! the balloon ghost thing?
 
 Yeah. It… took your... shiny… ball. 
 
@@ -113,7 +113,7 @@ Heh… I didn't go. I'd… melt…`,
         requiredClue: 'module-found',
         failedHint: 'Woah! It seems like its trying to speak with me. I need to FIND the translation module.',
         successHint: 'With the translation module installed, I can understand what Ditto is saying!',
-        successExtraHint: 'Ditto mentioned a flickering light. Maybe I should investigate that next. Could it be a Pokémon?',
+        successExtraHint: 'Ditto mentioned a flickering light. Maybe I should investigate that next. Could it be a fire Pokémon?',
     },
     'fireplace-charmander': {
         audioFile: 'fireplace-charmander.wav',
